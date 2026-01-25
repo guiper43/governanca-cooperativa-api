@@ -17,7 +17,8 @@ CREATE TABLE voto (
     associado_id VARCHAR(100) NOT NULL,
     voto_escolha VARCHAR(3) NOT NULL,
     CONSTRAINT fk_voto_pauta FOREIGN KEY (pauta_id) REFERENCES pauta (id) ON DELETE CASCADE,
-    CONSTRAINT uk_voto_pauta_associado UNIQUE (pauta_id, associado_id)
+    CONSTRAINT uk_voto_pauta_associado UNIQUE (pauta_id, associado_id),
+        CONSTRAINT ck_voto_escolha CHECK (voto_escolha IN ('SIM', 'NAO'))
 );
 
 CREATE INDEX idx_voto_pauta_id ON voto (pauta_id);
