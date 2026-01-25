@@ -4,9 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.UUID;
+
+import java.util.UUID;
 
 @Entity
 @Table(name = "pauta")
@@ -16,7 +18,7 @@ import org.hibernate.validator.constraints.UUID;
 public class Pauta {
     @Id
     @Column(name = "id", nullable = false)
-    private java.util.UUID id;
+    private UUID id;
     @Column(name = "descricao", nullable = false, columnDefinition = "text")
     private String descricao;
 
@@ -26,7 +28,7 @@ public class Pauta {
     }
 
     public static Pauta criar(java.util.UUID id, String descricao) {
-return new Pauta(id, descricao);
+        return new Pauta(id, descricao);
     }
 
 }
