@@ -22,8 +22,7 @@ public class PautaService {
     }
 
     public Pauta buscarEntidade(UUID id) {
-        return
-            repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow();
     }
 
 
