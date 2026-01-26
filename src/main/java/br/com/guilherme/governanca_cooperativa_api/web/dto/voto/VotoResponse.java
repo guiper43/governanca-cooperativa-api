@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public record VotoResponse(
     UUID pautaId,
-    String associadoId;
-        VotoEscolha votoEscolha
+    String associadoId,
+    VotoEscolha votoEscolha
 ) {
 }
