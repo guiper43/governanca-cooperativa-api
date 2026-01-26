@@ -8,7 +8,6 @@ import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoResponse
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -30,6 +29,6 @@ public class SessaoService {
         UUID id = UUID.randomUUID();
         Sessao sessao = Sessao.criar(id, pauta, abertura, fechamento);
         repository.save(sessao);
-return new SessaoResponse(sessao.getId(), pauta.getId(), sessao.getDataAbertura(), sessao.getDataFechamento());
+        return new SessaoResponse(sessao.getId(), pauta.getId(), sessao.getDataAbertura(), sessao.getDataFechamento());
+    }
 }
-
