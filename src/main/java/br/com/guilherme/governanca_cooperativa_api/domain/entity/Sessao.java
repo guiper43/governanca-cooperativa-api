@@ -2,6 +2,7 @@ package br.com.guilherme.governanca_cooperativa_api.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "sessao")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-
+@Getter
 public class Sessao {
     @Id
     @Column(name = "id", nullable = false)
