@@ -7,7 +7,9 @@ import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepos
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.resultado.ResultadoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,21 +22,24 @@ public class ResultadoService {
     private final PautaService pautaService;
 
     public ResultadoResponse consultar(UUID pautaId) {
-pautaService.buscarEntidade(pautaId);
-long totalSim = votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
-long totalNao = votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
+        pautaService.buscarEntidade(pautaId);
+        long totalSim = votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
+        long totalNao = votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
 
-        Sessao sessao = sessaoRepository.findByPautaId(pautaId).orElseThrow();
+        Sessao sessao = sessaoRepository.findByPautaId(pautaId)
+            .orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta"));
+
 
         ResultadoStatus status;
-        if (LocalDateTime.now().isBefore(sessao.getDataFechamento())){
+        if (LocalDateTime.now().isBefore(sessao.getDataFechamento())) {
             status = ResultadoStatus.EM_ANDAMENTO;
-        } else if (totalSim> totalNao) {
-            status= ResultadoStatus.APROVADA;
-        } else if (totalNao> totalSim) {
+        } else if (totalSim > totalNao) {
+            status = ResultadoStatus.APROVADA;
+        } else if (totalNao > totalSim) {
             status = ResultadoStatus.REPROVADA;
-        } else{
-            status= ResultadoStatus.EMPATE;
+        } else {
+            status = ResultadoStatus.EMPATE;
         }
         return new ResultadoResponse(pautaId, totalSim, totalNao, status);
     }
