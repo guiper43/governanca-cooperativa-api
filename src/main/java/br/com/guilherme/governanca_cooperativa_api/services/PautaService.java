@@ -27,4 +27,9 @@ public class PautaService {
         return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada"));
     }
 
+    public PautaResponse buscar(UUID id) {
+        Pauta pauta = buscarEntidade(id);
+        return new PautaResponse(pauta.getId(), pauta.getDescricao());
+    }
+
 }
