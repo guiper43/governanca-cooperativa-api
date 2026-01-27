@@ -5,11 +5,14 @@ import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
+import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,9 +27,13 @@ public class VotoService {
     public VotoResponse votar(VotoRequest request) {
         UUID pautaId = request.pautaId();
 
-        Sessao sessao = sessaoRepository.findByPautaId(pautaId).orElseThrow();
+        Sessao sessao = sessaoRepository.findByPautaId(pautaId)
+            .orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta"));
+
+
         if (LocalDateTime.now().isAfter(sessao.getDataFechamento())) {
-            throw new IllegalStateException("Sessão encerrada");
+            throw new BusinessException("Sessão encerrada");
         }
 
         Pauta pauta = pautaService.buscarEntidade(pautaId);

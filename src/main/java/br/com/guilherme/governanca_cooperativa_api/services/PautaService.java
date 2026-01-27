@@ -5,7 +5,9 @@ import br.com.guilherme.governanca_cooperativa_api.domain.repository.PautaReposi
 import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -22,8 +24,7 @@ public class PautaService {
     }
 
     public Pauta buscarEntidade(UUID id) {
-        return repository.findById(id).orElseThrow();
+        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada"));
     }
-
 
 }
