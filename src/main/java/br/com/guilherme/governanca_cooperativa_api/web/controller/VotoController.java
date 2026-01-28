@@ -23,6 +23,6 @@ public class VotoController {
     public ResponseEntity<VotoResponse> votar(
         @PathVariable UUID pautaId, @Valid @RequestBody VotoRequest request) {
         var response = service.votar(pautaId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response)
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
