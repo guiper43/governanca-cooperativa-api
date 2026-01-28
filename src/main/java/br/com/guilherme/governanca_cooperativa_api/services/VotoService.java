@@ -24,8 +24,7 @@ public class VotoService {
     private final SessaoRepository sessaoRepository;
     private final PautaService pautaService;
 
-    public VotoResponse votar(VotoRequest request) {
-        UUID pautaId = request.pautaId();
+    public VotoResponse votar(UUID pautaId, VotoRequest request) {
 
         Sessao sessao = sessaoRepository.findByPautaId(pautaId)
             .orElseThrow(() ->
@@ -43,7 +42,7 @@ public class VotoService {
         try {
             votoRepository.save(voto);
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalStateException("Associado já votou nessa sessão");
+            throw new BusinessException("Associado já votou nessa sessão");
         }
         return new VotoResponse(voto.getId(), pauta.getId(), voto.getAssociadoId(), voto.getVotoEscolha());
     }
