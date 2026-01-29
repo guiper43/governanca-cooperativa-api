@@ -34,6 +34,7 @@ public class PautaController {
         return ResponseEntity.ok(response);
     }
 
+
     @GetMapping("/{pautaId}/resultado")
     public ResponseEntity<ResultadoResponse> consultarResultado(@PathVariable UUID pautaId) {
         var response = resultadoService.consultar(pautaId);
