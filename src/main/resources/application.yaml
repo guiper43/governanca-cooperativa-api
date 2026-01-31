@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: governanca-cooperativa-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/governanca_cooperativa
+    username: governanca_user
+    password: governanca_pass
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+integrations:
+  cpf-validator:
+    url: https://user-info.herokuapp.com
+    enabled: true
+    fallback-enabled: true
+    unable-cpfs: [ ]
+
+
