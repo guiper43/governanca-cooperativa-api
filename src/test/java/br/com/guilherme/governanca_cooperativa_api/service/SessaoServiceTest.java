@@ -4,8 +4,6 @@ import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
-import br.com.guilherme.governanca_cooperativa_api.services.PautaService;
-import br.com.guilherme.governanca_cooperativa_api.services.SessaoService;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoRequest;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoResponse;
 import org.junit.jupiter.api.Test;

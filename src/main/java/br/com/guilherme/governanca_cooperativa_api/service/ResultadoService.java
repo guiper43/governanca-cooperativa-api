@@ -1,4 +1,4 @@
-package br.com.guilherme.governanca_cooperativa_api.services;
+package br.com.guilherme.governanca_cooperativa_api.service;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.ResultadoStatus;

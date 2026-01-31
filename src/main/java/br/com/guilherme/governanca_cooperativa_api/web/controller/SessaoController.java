@@ -1,6 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller;
 
-import br.com.guilherme.governanca_cooperativa_api.services.SessaoService;
+import br.com.guilherme.governanca_cooperativa_api.service.SessaoService;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoRequest;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoResponse;
 import jakarta.validation.Valid;

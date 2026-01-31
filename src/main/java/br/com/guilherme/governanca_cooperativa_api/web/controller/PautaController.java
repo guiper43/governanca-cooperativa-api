@@ -1,7 +1,7 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller;
 
-import br.com.guilherme.governanca_cooperativa_api.services.PautaService;
-import br.com.guilherme.governanca_cooperativa_api.services.ResultadoService;
+import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
+import br.com.guilherme.governanca_cooperativa_api.service.ResultadoService;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaResponse;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.resultado.ResultadoResponse;

@@ -1,6 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller;
 
-import br.com.guilherme.governanca_cooperativa_api.services.VotoService;
+import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoResponse;
 import jakarta.validation.Valid;
