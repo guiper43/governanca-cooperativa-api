@@ -21,8 +21,7 @@ public class SessaoController {
 
     @PostMapping
     public ResponseEntity<SessaoResponse> abrir(@PathVariable UUID pautaId, @Valid @RequestBody(required = false) SessaoRequest request) {
-        Integer duracao = request.duracaoMinutos() == null ? 1 : request.duracaoMinutos();
-        var response = service.abrir(pautaId, duracao);
+        var response = service.abrir(pautaId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

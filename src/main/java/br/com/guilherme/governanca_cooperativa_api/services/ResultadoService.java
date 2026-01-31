@@ -23,16 +23,17 @@ public class ResultadoService {
 
     public ResultadoResponse consultar(UUID pautaId) {
         pautaService.buscarEntidade(pautaId);
+
+        Sessao sessao = sessaoRepository.findByPautaId(pautaId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta"));
+
         long totalSim = votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
         long totalNao = votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
 
-        Sessao sessao = sessaoRepository.findByPautaId(pautaId)
-            .orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta"));
-
+        LocalDateTime agora = LocalDateTime.now();
 
         ResultadoStatus status;
-        if (LocalDateTime.now().isBefore(sessao.getDataFechamento())) {
+        if (agora.isBefore(sessao.getDataFechamento())) {
             status = ResultadoStatus.EM_ANDAMENTO;
         } else if (totalSim > totalNao) {
             status = ResultadoStatus.APROVADA;
@@ -41,8 +42,7 @@ public class ResultadoService {
         } else {
             status = ResultadoStatus.EMPATE;
         }
+
         return new ResultadoResponse(pautaId, totalSim, totalNao, status);
     }
-
-
 }
