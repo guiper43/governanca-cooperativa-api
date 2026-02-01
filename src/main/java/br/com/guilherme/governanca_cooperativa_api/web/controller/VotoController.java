@@ -17,7 +17,7 @@ import java.util.UUID;
 import br.com.guilherme.governanca_cooperativa_api.doc.VotoControllerDoc;
 
 @RestController
-@RequestMapping("/pautas/{pautaId}/votos")
+@RequestMapping("/v1/pautas/{pautaId}/votos")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
