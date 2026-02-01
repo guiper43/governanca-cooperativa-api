@@ -5,11 +5,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public record VotoRequest(
-    @NotBlank
-    @Pattern(regexp = "\\d{11}")
-    String associadoId,
-    @NotNull
-    VotoEscolha votoEscolha
-) {
+        @Schema(description = "CPF do associado (apenas números)", example = "12345678901", requiredMode = Schema.RequiredMode.REQUIRED) @NotBlank @Pattern(regexp = "\\d{11}") String associadoId,
+
+        @Schema(description = "Escolha do voto. Valores aceitos: SIM, NAO", example = "SIM", requiredMode = Schema.RequiredMode.REQUIRED) @NotNull VotoEscolha votoEscolha) {
 }
