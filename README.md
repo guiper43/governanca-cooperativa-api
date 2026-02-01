@@ -1,86 +1,47 @@
 # Governança Cooperativa API
 
-API REST desenvolvida em **Java 21** com **Spring Boot 3** para gerenciamento de sessões de votação em cooperativas. Permite o cadastro de pautas, abertura de sessões de votação, recepção de votos de associados (com validação externa de CPF) e contabilização dos resultados.
+## Sobre o Projeto
+API REST desenvolvida para gerenciamento de assembleias em cooperativas. O sistema controla o ciclo de vida completo das votações: cadastro de pautas, abertura de sessões com tempo delimitado, recebimento de votos de associados e contabilização dos resultados.
 
-> [!WARNING]
-> **Aviso sobre Dependências Externas**
-> O serviço externo de validação de CPF (`https://user-info.herokuapp.com/users/{cpf}`) encontra-se **indisponível/instável**.
-> Para validar o fluxo de votação localmente, recomenda-se o uso de mocks ou a execução dos testes unitários que isolam essa dependência.
+## Tecnologias
 
-## 🚀 Tecnologias
+| Tecnologia | Versão/Finalidade |
+| :--- | :--- |
+| **Java** | 21 (LTS) - Linguagem core. |
+| **Spring Boot** | 3.5.10 - Framework de aplicação. |
+| **PostgreSQL** | 16 - Banco de dados relacional. |
+| **Flyway** | 11.x - Versionamento e automação de schemas de banco. |
+| **OpenFeign** | Spring Cloud - Cliente HTTP declarativo para integração externa. |
+| **Caelum Stella** | 2.1.6 - Validação de CPF (Motor de Fallback). |
+| **SpringDoc** | 2.7.0 - Documentação OpenAPI automatizada. |
+| **Docker** | Containerização do ambiente de banco de dados. |
 
-- **Java 21**
-- **Spring Boot 3.x**
-- **PostgreSQL** (Banco de dados)
-- **Flyway** (Migração de dados)
-- **Spring Cloud OpenFeign** (Integração externa)
-- **Docker & Docker Compose**
-- **JUnit 5 + Mockito** (Testes Unitários)
-- **Lombok**
+## Quick Start
 
-## 🛠️ Pré-requisitos
+Execute os comandos abaixo na raiz do projeto para configurar o banco de dados e iniciar a aplicação:
 
-- Java JDK 21
-- Docker e Docker Compose
-- Maven (wrapper incluído no projeto)
-
-## 🐳 Como Rodar
-
-### 1. Subir a Infraestrutura
-Utilize o Docker Compose para iniciar o banco de dados PostgreSQL:
 ```bash
+# 1. Iniciar infraestrutura de banco de dados (PostgreSQL)
 docker-compose up -d
+
+# 2. Compilar e executar a aplicação (Spring Boot)
+./mvnw clean spring-boot:run
 ```
 
-### 2. Executar a Aplicação
-Com o banco rodando, execute a aplicação utilizando o Maven Wrapper:
-```bash
-./mvnw spring-boot:run
-```
-A API estará disponível em: `http://localhost:8080`
+## Estratégia de Resiliência
+O sistema prioriza a continuidade do negócio acima da dependência externa. A validação de aptidão do associado (CPF) consulta uma API externa primária.
 
-### 3. Solução de Contorno (Serviço Externo)
-Como o validador de CPF está offline, utilize o profile de testes ou mocks para simular respostas:
-- **Testes Unitários**: `./mvnw test` (validam a regra de negócio com mocks do Mockito).
-- **Execução Local**: Se necessário, implementar um **Stub/WireMock** na porta da API externa para retornar `{ "status": "ABLE_TO_VOTE" }`.
+Devido à instabilidade inerente do serviço externo, foi implementado um mecanismo de **Fallback Local**:
+1. O sistema tenta validar o CPF via API externa.
+2. Em caso de falha (indisponibilidade ou timeout), a validação assume automaticamente um algoritmo local (Caelum Stella).
+Isso garante que as assembleias e votações não sejam interrompidas por falhas em serviços de terceiros.
 
-## 🧪 Como Testar
+## Notas de Configuração e Segurança
+O arquivo `application.properties` (ou `application.yaml`) contendo as credenciais de banco de dados foi intencionalmente versionado neste repositório.
 
-### Testes Automatizados (Unitários)
-O projeto conta com cobertura de testes unitários utilizando JUnit 5 e Mockito.
-```bash
-./mvnw test
-```
+Esta decisão visa facilitar a **avaliação técnica imediata** ("Clone and Run"), eliminando a necessidade de configuração de ambiente por parte do avaliador. Em um ambiente produtivo real, estas credenciais seriam injetadas via variáveis de ambiente ou gerenciadores de segredos (como AWS Secrets Manager), jamais expostas no controle de versão.
 
-### Testes Manuais de Endpoints (.http)
-Para testar os endpoints via VS Code (Rest Client) ou IntelliJ (HTTP Client), utilize o arquivo de requisições incluído no projeto:
-📍 **Caminho**: `src/main/java/br/com/guilherme/governanca_cooperativa_api/web/controller/api_testes.http`
+## Endpoints
+A documentação interativa e especificação da API estão disponíveis no Swagger UI:
 
-Este arquivo contém exemplos prontos para:
-1. Criar Pauta
-2. Abrir Sessão
-3. Votar (Cenários de Sucesso e Erro)
-4. Consultar Resultados
-
-## 📡 Endpoints Principais
-
-### Pauta
-- `POST /pautas`: Cria uma nova pauta.
-- `GET /pautas/{id}`: Busca detalhes de uma pauta.
-
-### Sessão
-- `POST /pautas/{pautaId}/sessoes`: Abre uma sessão de votação para uma pauta.
-  - *Body opcional*: `{ "duracaoMinutos": 10 }` (Default: 1 min).
-
-### Voto
-- `POST /pautas/{pautaId}/votos`: Registra um voto.
-  - *Body*: `{ "associadoId": "CPF", "votoEscolha": "SIM/NAO" }`
-
-### Resultado
-- `GET /pautas/{pautaId}/resultado`: Exibe o resultado da votação (Aprovada/Reprovada/Empate).
-
-## 🏗️ Padrões de Projeto
-
-- **Arquitetura em Camadas**: Controller, Service, Repository, Entity.
-- **DTOs (Records)**: Utilizados para entrada e saída de dados da API.
-- **Tratamento de Erros Centralizado**: `GlobalExceptionHandler` mapeando exceções de negócio para status HTTP.
+**URL Local:** [http://localhost:8080/docs](http://localhost:8080/docs)
