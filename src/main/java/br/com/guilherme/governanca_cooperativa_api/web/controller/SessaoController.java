@@ -16,7 +16,7 @@ import java.util.UUID;
 import br.com.guilherme.governanca_cooperativa_api.doc.SessaoControllerDoc;
 
 @RestController
-@RequestMapping("/pautas/{pautaId}/sessoes")
+@RequestMapping("/v1/pautas/{pautaId}/sessoes")
 @RequiredArgsConstructor
 @Validated
 @Slf4j

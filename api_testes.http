@@ -1,0 +1,87 @@
+@host = http://localhost:8080
+    @host = http://localhost:8080
+
+# @name criarPauta
+POST {{host}}/v1/pautas
+Content-Type: application/json
+
+{
+  "descricao": "Assembleia interna para votação de novos membros"
+}
+
+###
+
+@pautaId = {{criarPauta.response.body.id}}
+
+###
+
+GET {{host}}/v1/pautas/{{pautaId}}
+
+###
+
+POST {{host}}/v1/pautas/{{pautaId}}/sessoes
+Content-Type: application/json
+
+{
+  "duracaoMinutos": 5
+}
+
+###
+
+# Voto 1 (SIM)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "88206972070",
+  "votoEscolha": "SIM"
+}
+
+###
+
+# Voto 2 (NAO)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "72648057007",
+  "votoEscolha": "NAO"
+}
+
+###
+
+GET {{host}}/v1/pautas/{{pautaId}}/resultado
+
+###
+
+# Voto 3 (SIM) - Tenta votar novamente? (Associados diferentes)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "66699317046",
+  "votoEscolha": "SIM"
+}
+
+###
+
+# Voto 4 (SIM)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "32220199042",
+  "votoEscolha": "SIM"
+}
+
+###
+
+# Voto 5 (NAO)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+    "associadoId": "83963057068",
+  "votoEscolha": "NAO"
+}
+

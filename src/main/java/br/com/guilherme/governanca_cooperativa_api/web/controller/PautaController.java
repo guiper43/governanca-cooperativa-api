@@ -18,7 +18,7 @@ import java.util.UUID;
 import br.com.guilherme.governanca_cooperativa_api.doc.PautaControllerDoc;
 
 @RestController
-@RequestMapping("/pautas")
+@RequestMapping("/v1/pautas")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
