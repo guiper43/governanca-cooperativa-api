@@ -2,6 +2,8 @@ package br.com.guilherme.governanca_cooperativa_api.service;
 
 import br.com.guilherme.governanca_cooperativa_api.client.CpfValidationClient;
 import br.com.guilherme.governanca_cooperativa_api.config.CpfValidationProperties;
+
+import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
@@ -37,20 +39,22 @@ public class VotoService {
     public VotoResponse votar(UUID pautaId, VotoRequest request) {
         log.info("Iniciando voto. pautaId={}", pautaId);
         Sessao sessao = sessaoRepository.findByPautaId(pautaId)
-            .orElseThrow(() -> {
-                log.warn("Sessão não encontrada para pauta. pautaId={}", pautaId);
-                return new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta");
-            });
+                .orElseThrow(() -> {
+                    log.warn("Sessão não encontrada para pauta. pautaId={}", pautaId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta");
+                });
 
         if (LocalDateTime.now().isAfter(sessao.getDataFechamento())) {
-            log.warn("Sessão encerrada. pautaId={} sessaoId={} dataFechamento={}", pautaId, sessao.getId(), sessao.getDataFechamento());
+            log.warn("Sessão encerrada. pautaId={} sessaoId={} dataFechamento={}", pautaId, sessao.getId(),
+                    sessao.getDataFechamento());
             throw new BusinessException("Sessão encerrada");
         }
 
         CpfValidationStatus statusCpf = resolverStatusCpf(request.associadoId());
 
         if (statusCpf == CpfValidationStatus.UNABLE_TO_VOTE) {
-            log.warn("Associado inapto a votar. pautaId={} sessaoId={} cpf={}", pautaId, sessao.getId(), mascararCpf(request.associadoId()));
+            log.warn("Associado inapto a votar. pautaId={} sessaoId={} cpf={}", pautaId, sessao.getId(),
+                    mascararCpf(request.associadoId()));
             throw new BusinessException("CPF não está apto a votar");
         }
 
@@ -65,7 +69,7 @@ public class VotoService {
             throw new BusinessException("Associado já votou nessa sessão");
         }
         log.info("Voto registrado com sucesso. votoId={} pautaId={} sessaoId={} escolha={}",
-            voto.getId(), pautaId, sessao.getId(), voto.getVotoEscolha());
+                voto.getId(), pautaId, sessao.getId(), voto.getVotoEscolha());
         return new VotoResponse(voto.getId(), pauta.getId(), voto.getAssociadoId(), voto.getVotoEscolha());
     }
 
@@ -82,8 +86,7 @@ public class VotoService {
 
             if (properties.isFallbackEnabled()) {
                 log.warn("Falha na validação externa. Acionando fallback local. httpStatus={} cpf={}", e.status(),
-                    mascararCpf(cpf)
-                );
+                        mascararCpf(cpf));
                 return validator.validarStatus(cpf);
             }
 
@@ -100,10 +103,5 @@ public class VotoService {
 
         }
     }
-
-    private String mascararCpf(String cpf) {
-        return cpf.substring(0, 3) + "*****" + cpf.substring(9);
-    }
-
 
 }
