@@ -1,9 +1,9 @@
-package br.com.guilherme.governanca_cooperativa_api.web.controller;
+package br.com.guilherme.governanca_cooperativa_api.web.controller.rest;
 
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
 import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

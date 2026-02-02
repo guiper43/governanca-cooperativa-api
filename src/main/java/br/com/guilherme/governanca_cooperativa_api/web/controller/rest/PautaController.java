@@ -1,10 +1,10 @@
-package br.com.guilherme.governanca_cooperativa_api.web.controller;
+package br.com.guilherme.governanca_cooperativa_api.web.controller.rest;
 
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.ResultadoService;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.resultado.ResultadoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.resultado.ResultadoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

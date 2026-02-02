@@ -1,7 +1,7 @@
 package br.com.guilherme.governanca_cooperativa_api.doc;
 
-import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao.SessaoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao.SessaoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

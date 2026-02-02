@@ -1,7 +1,7 @@
 package br.com.guilherme.governanca_cooperativa_api.doc;
 
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

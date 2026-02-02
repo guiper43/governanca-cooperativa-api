@@ -2,11 +2,11 @@ package br.com.guilherme.governanca_cooperativa_api.service;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.ResultadoStatus;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.ResultadoStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.resultado.ResultadoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.resultado.ResultadoResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

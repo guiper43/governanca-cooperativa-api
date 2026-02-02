@@ -7,13 +7,13 @@ import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascara
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

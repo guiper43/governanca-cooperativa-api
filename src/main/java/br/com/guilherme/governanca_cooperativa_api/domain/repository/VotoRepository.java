@@ -1,7 +1,7 @@
 package br.com.guilherme.governanca_cooperativa_api.domain.repository;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
