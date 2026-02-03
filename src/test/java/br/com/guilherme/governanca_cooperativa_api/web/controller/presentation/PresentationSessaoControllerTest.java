@@ -3,8 +3,8 @@ package br.com.guilherme.governanca_cooperativa_api.web.controller.presentation;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation.SessaoTelaAssembler;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaFormularioResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaFormularioResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,20 +36,20 @@ class PresentationSessaoControllerTest {
     void getTelaAberturaSessao_sucesso_retornaStatusOk() {
         UUID pautaId = UUID.randomUUID();
         Pauta pautaMock = pauta(pautaId, "Pauta");
-        TelaResponse telaConcrete = new TelaFormularioResponse("Titulo", Collections.emptyList(), null);
+        PresentationTelaResponse telaConcrete = new PresentationTelaFormularioResponse("Titulo", Collections.emptyList(), null);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pautaMock);
         when(assembler.montarTelaAbertura(pautaMock)).thenReturn(telaConcrete);
 
-        ResponseEntity<TelaResponse> response = controller.getTelaAberturaSessao(pautaId);
+        ResponseEntity<PresentationTelaResponse> response = controller.getTelaAberturaSessao(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
         verify(assembler).montarTelaAbertura(pautaMock);
         verifyNoMoreInteractions(pautaService, assembler);
 
         assertAll(
-                () -> assertNotNull(response),
-                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                () -> assertSame(telaConcrete, response.getBody()));
+            () -> assertNotNull(response),
+            () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+            () -> assertSame(telaConcrete, response.getBody()));
     }
 }

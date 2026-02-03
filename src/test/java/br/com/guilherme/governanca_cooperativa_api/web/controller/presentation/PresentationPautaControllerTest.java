@@ -1,8 +1,8 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller.presentation;
 
 import br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation.PautaTelaAssembler;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaFormularioResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaFormularioResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,17 +27,17 @@ class PresentationPautaControllerTest {
 
     @Test
     void getTelaCadastroPauta_sucesso_retornaStatusOkEAcaoDoAssembler() {
-        TelaResponse telaConcrete = new TelaFormularioResponse("Titulo", Collections.emptyList(), null);
+        PresentationTelaResponse telaConcrete = new PresentationTelaFormularioResponse("Titulo", Collections.emptyList(), null);
         when(assembler.montarTelaCadastro()).thenReturn(telaConcrete);
 
-        ResponseEntity<TelaResponse> response = controller.getTelaCadastroPauta();
+        ResponseEntity<PresentationTelaResponse> response = controller.getTelaCadastroPauta();
 
         verify(assembler).montarTelaCadastro();
         verifyNoMoreInteractions(assembler);
 
         assertAll(
-                () -> assertNotNull(response),
-                () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
-                () -> assertSame(telaConcrete, response.getBody()));
+            () -> assertNotNull(response),
+            () -> assertEquals(HttpStatus.OK, response.getStatusCode()),
+            () -> assertSame(telaConcrete, response.getBody()));
     }
 }

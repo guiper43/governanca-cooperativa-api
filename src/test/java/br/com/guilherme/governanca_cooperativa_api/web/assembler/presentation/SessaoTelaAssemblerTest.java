@@ -3,10 +3,10 @@ package br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.presentation.TipoComponenteMobile;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.presentation.TipoTelaMobile;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.BotaoAcaoMobile;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.ComponenteVisualMobile;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaFormularioResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationBotaoAcao;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationComponenteVisual;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaFormularioResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,31 +28,31 @@ class SessaoTelaAssemblerTest {
         UUID pautaId = UUID.randomUUID();
         Pauta pauta = pauta(pautaId, "Pauta Teste Assemble");
 
-        TelaResponse response = assembler.montarTelaAbertura(pauta);
+        PresentationTelaResponse response = assembler.montarTelaAbertura(pauta);
 
         assertNotNull(response);
-        assertInstanceOf(TelaFormularioResponse.class, response);
+        assertInstanceOf(PresentationTelaFormularioResponse.class, response);
 
-        TelaFormularioResponse telaForm = (TelaFormularioResponse) response;
+        PresentationTelaFormularioResponse telaForm = (PresentationTelaFormularioResponse) response;
 
         assertAll(
-                () -> assertEquals("Abrir Sessão: Pauta Teste Assemble", telaForm.titulo()),
-                () -> assertEquals(TipoTelaMobile.FORMULARIO, telaForm.tipo()),
-                () -> assertNotNull(telaForm.itens()),
-                () -> assertEquals(1, telaForm.itens().size()),
-                () -> assertNotNull(telaForm.botaoOk()));
+            () -> assertEquals("Abrir Sessão: Pauta Teste Assemble", telaForm.titulo()),
+            () -> assertEquals(TipoTelaMobile.FORMULARIO, telaForm.tipo()),
+            () -> assertNotNull(telaForm.itens()),
+            () -> assertEquals(1, telaForm.itens().size()),
+            () -> assertNotNull(telaForm.botaoOk()));
 
-        ComponenteVisualMobile input = telaForm.itens().get(0);
+        PresentationComponenteVisual input = telaForm.itens().get(0);
         assertAll(
-                () -> assertEquals("duracaoMinutos", input.id()),
-                () -> assertEquals("1", input.valor()),
-                () -> assertEquals(TipoComponenteMobile.INPUT_NUMERO, input.tipo()));
+            () -> assertEquals("duracaoMinutos", input.id()),
+            () -> assertEquals("1", input.valor()),
+            () -> assertEquals(TipoComponenteMobile.INPUT_NUMERO, input.tipo()));
 
-        BotaoAcaoMobile botao = telaForm.botaoOk();
+        PresentationBotaoAcao botao = telaForm.botaoOk();
         assertAll(
-                () -> assertEquals("Iniciar Sessão", botao.texto()),
-                () -> assertEquals("/v1/pautas/" + pautaId + "/sessoes", botao.url()),
-                () -> assertNotNull(botao.body()),
-                () -> assertTrue(botao.body().containsKey("duracaoMinutos")));
+            () -> assertEquals("Iniciar Sessão", botao.texto()),
+            () -> assertEquals("/v1/pautas/" + pautaId + "/sessoes", botao.url()),
+            () -> assertNotNull(botao.body()),
+            () -> assertTrue(botao.body().containsKey("duracaoMinutos")));
     }
 }
