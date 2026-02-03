@@ -2,8 +2,8 @@ package br.com.guilherme.governanca_cooperativa_api.service;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.PautaRepository;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

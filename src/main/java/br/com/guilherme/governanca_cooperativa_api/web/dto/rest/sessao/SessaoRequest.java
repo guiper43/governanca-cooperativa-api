@@ -1,4 +1,4 @@
-package br.com.guilherme.governanca_cooperativa_api.web.dto.sessao;
+package br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

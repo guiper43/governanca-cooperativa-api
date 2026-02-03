@@ -1,7 +1,11 @@
 # Governança Cooperativa API
 
 ## Sobre o Projeto
-API REST desenvolvida para gerenciamento de assembleias em cooperativas. O sistema controla o ciclo de vida completo das votações: cadastro de pautas, abertura de sessões com tempo delimitado, recebimento de votos de associados e contabilização dos resultados.
+API Híbrida (REST + Server-Driven UI) desenvolvida para gerenciamento de assembleias em cooperativas.
+
+O sistema opera em duas frentes:
+1.  **Core de Negócio**: Endpoints REST clássicos para controle do ciclo de vida das votações (Pautas, Sessões e Votos).
+2.  **Mobile Presentation**: Endpoints de UI Server-Driven que entregam telas prontas em JSON para o aplicativo, desacoplando o front-end das regras de negócio.
 
 ## Tecnologias
 
@@ -28,6 +32,22 @@ docker-compose up -d
 ./mvnw clean spring-boot:run
 ```
 
+> **Nota**: O projeto utiliza **Maven Wrapper** para garantir que todos os desenvolvedores e pipelines de CI/CD utilizem a mesma versão do Maven ("Universal"). Caso precise regenerar os scripts ou atualizar a versão, execute: `mvn -N wrapper:wrapper`.
+
+## Como Testar
+Para facilitar a validação manual dos fluxos de ponta a ponta (Mobile e REST), o projeto inclui um arquivo de testes HTTP executável na raiz.
+
+**Arquivo:** `api_testes.http`
+
+O arquivo roteiriza o fluxo completo de uso:
+1.  **Mobile**: Renderização das telas de cadastro e votação (Server-Driven UI).
+2.  **REST**: Criação de Pautas, Abertura de Sessão e Persistência.
+3.  **Cenários**: Fluxo feliz, validação de CPF e erros (ex: sessão expirada).
+
+**Ferramenta Recomendada:**
+*   **VS Code**: Utilize a extensão **REST Client** para executar as requisições diretamente do editor.
+*   Basta abrir o arquivo e clicar nos botões `Send Request` que aparecem acima de cada requisição.
+
 ## Estratégia de Resiliência
 O sistema prioriza a continuidade do negócio acima da dependência externa. A validação de aptidão do associado (CPF) consulta uma API externa primária.
 
@@ -37,7 +57,7 @@ Devido à instabilidade inerente do serviço externo, foi implementado um mecani
 Isso garante que as assembleias e votações não sejam interrompidas por falhas em serviços de terceiros.
 
 ## Notas de Configuração e Segurança
-O arquivo `application.properties` (ou `application.yaml`) contendo as credenciais de banco de dados foi intencionalmente versionado neste repositório.
+O arquivo `application.yaml` contendo as credenciais de banco de dados foi intencionalmente versionado neste repositório.
 
 Esta decisão visa facilitar a **avaliação técnica imediata** ("Clone and Run"), eliminando a necessidade de configuração de ambiente por parte do avaliador. Em um ambiente produtivo real, estas credenciais seriam injetadas via variáveis de ambiente ou gerenciadores de segredos (como AWS Secrets Manager), jamais expostas no controle de versão.
 

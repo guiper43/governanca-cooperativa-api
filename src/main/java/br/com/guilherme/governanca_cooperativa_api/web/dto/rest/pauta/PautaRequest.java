@@ -1,4 +1,4 @@
-package br.com.guilherme.governanca_cooperativa_api.web.dto.pauta;
+package br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

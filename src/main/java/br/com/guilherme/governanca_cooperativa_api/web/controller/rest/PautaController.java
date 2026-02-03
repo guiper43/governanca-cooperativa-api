@@ -1,10 +1,10 @@
-package br.com.guilherme.governanca_cooperativa_api.web.controller;
+package br.com.guilherme.governanca_cooperativa_api.web.controller.rest;
 
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.ResultadoService;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.resultado.ResultadoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.resultado.ResultadoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ public class PautaController implements PautaControllerDoc {
     private final PautaService pautaService;
     private final ResultadoService resultadoService;
 
+    @Override
     @PostMapping
     public ResponseEntity<PautaResponse> criar(@Valid @RequestBody PautaRequest request) {
         log.info("Requisição para criar pauta recebida.");
@@ -33,12 +34,14 @@ public class PautaController implements PautaControllerDoc {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<PautaResponse> buscarPorId(@PathVariable UUID id) {
         var response = pautaService.buscar(id);
         return ResponseEntity.ok(response);
     }
 
+    @Override
     @GetMapping("/{pautaId}/resultado")
     public ResponseEntity<ResultadoResponse> consultarResultado(@PathVariable UUID pautaId) {
         var response = resultadoService.consultar(pautaId);

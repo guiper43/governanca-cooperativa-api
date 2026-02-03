@@ -2,7 +2,7 @@ package br.com.guilherme.governanca_cooperativa_api.utils;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaRequest;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

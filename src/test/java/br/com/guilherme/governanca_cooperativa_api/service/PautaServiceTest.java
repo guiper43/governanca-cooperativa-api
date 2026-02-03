@@ -2,8 +2,8 @@ package br.com.guilherme.governanca_cooperativa_api.service;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.PautaRepository;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.pauta.PautaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.pauta.PautaResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

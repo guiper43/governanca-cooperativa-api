@@ -3,8 +3,8 @@ package br.com.guilherme.governanca_cooperativa_api.service.voto;
 import br.com.guilherme.governanca_cooperativa_api.client.CpfValidationClient;
 import br.com.guilherme.governanca_cooperativa_api.config.CpfValidationProperties;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
@@ -12,8 +12,8 @@ import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
 import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.client.CpfValidationResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.*;
-import static br.com.guilherme.governanca_cooperativa_api.utils.VotoServiceTestDataFactory.requestPadrao;
+import static br.com.guilherme.governanca_cooperativa_api.utils.VotoServiceTestDataFactory.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -67,7 +67,7 @@ class VotoServicePersistenciaTest {
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         when(client.buscarStatusCpf(request.associadoId()))
-            .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
+                .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
 
@@ -84,11 +84,10 @@ class VotoServicePersistenciaTest {
         Voto votoSalvo = votoCaptor.getValue();
 
         assertAll(
-            () -> assertEquals(votoSalvo.getId(), response.id()),
-            () -> assertEquals(pautaId, response.pautaId()),
-            () -> assertEquals(request.associadoId(), response.associadoId()),
-            () -> assertEquals(request.votoEscolha(), response.votoEscolha())
-        );
+                () -> assertEquals(votoSalvo.getId(), response.id()),
+                () -> assertEquals(pautaId, response.pautaId()),
+                () -> assertEquals(CPF_VALIDO_MASCARADO, response.associadoId()),
+                () -> assertEquals(request.votoEscolha(), response.votoEscolha()));
 
         verifyNoInteractions(validator);
         verifyNoMoreInteractions(sessaoRepository, properties, client, pautaService, votoRepository);
@@ -109,7 +108,7 @@ class VotoServicePersistenciaTest {
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         when(client.buscarStatusCpf(request.associadoId()))
-            .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
+                .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
 

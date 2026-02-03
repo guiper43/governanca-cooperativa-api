@@ -8,7 +8,7 @@ import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
 import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

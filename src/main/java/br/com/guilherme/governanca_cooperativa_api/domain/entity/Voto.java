@@ -1,6 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.domain.entity;
 
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

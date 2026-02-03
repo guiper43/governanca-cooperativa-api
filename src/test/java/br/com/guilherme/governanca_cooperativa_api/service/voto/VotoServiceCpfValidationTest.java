@@ -2,7 +2,7 @@ package br.com.guilherme.governanca_cooperativa_api.service.voto;
 
 import br.com.guilherme.governanca_cooperativa_api.client.CpfValidationClient;
 import br.com.guilherme.governanca_cooperativa_api.config.CpfValidationProperties;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
@@ -10,7 +10,7 @@ import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
 import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.client.CpfValidationResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.voto.VotoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
 import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

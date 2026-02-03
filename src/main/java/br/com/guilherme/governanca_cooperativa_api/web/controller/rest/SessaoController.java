@@ -1,8 +1,8 @@
-package br.com.guilherme.governanca_cooperativa_api.web.controller;
+package br.com.guilherme.governanca_cooperativa_api.web.controller.rest;
 
 import br.com.guilherme.governanca_cooperativa_api.service.SessaoService;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.sessao.SessaoResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao.SessaoRequest;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao.SessaoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +23,7 @@ import br.com.guilherme.governanca_cooperativa_api.doc.SessaoControllerDoc;
 public class SessaoController implements SessaoControllerDoc {
     private final SessaoService service;
 
+    @Override
     @PostMapping
     public ResponseEntity<SessaoResponse> abrir(@PathVariable UUID pautaId,
             @Valid @RequestBody(required = false) SessaoRequest request) {
