@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Map;
 
 @Schema(description = "Item de lista de seleção")
-public record ItemSelecaoMobile(
+public record PresentationItemSelecao(
         @Schema(description = "Texto exibido", example = "Sim") String texto,
 
         @Schema(description = "URL para ação de seleção", example = "/v1/votos") String url,
