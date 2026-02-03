@@ -25,7 +25,7 @@ public class CpfLocalValidator {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "CPF inválido");
         }
 
-        Set<String> cpfsInaptos = properties.getUnableCpfs();
+        Set<String> cpfsInaptos = properties.unableCpfs();
 
         if (cpfsInaptos != null && cpfsInaptos.contains(cpf)) {
             return CpfValidationStatus.UNABLE_TO_VOTE;
