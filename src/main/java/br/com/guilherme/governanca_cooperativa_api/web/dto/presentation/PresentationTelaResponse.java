@@ -7,11 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "tipo", visible = true)
 @JsonSubTypes({
-                @JsonSubTypes.Type(value = TelaFormularioResponse.class, name = "FORMULARIO"),
-                @JsonSubTypes.Type(value = TelaSelecaoResponse.class, name = "SELECAO")
+                @JsonSubTypes.Type(value = PresentationTelaFormularioResponse.class, name = "FORMULARIO"),
+                @JsonSubTypes.Type(value = PresentationTelaSelecaoResponse.class, name = "SELECAO")
 })
 @Schema(description = "Contrato base de tela", discriminatorProperty = "tipo")
-public sealed interface TelaResponse permits TelaFormularioResponse, TelaSelecaoResponse {
+public sealed interface PresentationTelaResponse permits PresentationTelaFormularioResponse, PresentationTelaSelecaoResponse {
         String titulo();
 
         TipoTelaMobile tipo();

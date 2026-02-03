@@ -5,14 +5,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "Tela do tipo SELECAO")
-public record TelaSelecaoResponse(
+public record PresentationTelaSelecaoResponse(
         String titulo,
 
         @Schema(defaultValue = "SELECAO") TipoTelaMobile tipo,
 
-        List<ItemSelecaoMobile> itens) implements TelaResponse {
+        List<PresentationItemSelecao> itens) implements PresentationTelaResponse {
 
-    public TelaSelecaoResponse(String titulo, List<ItemSelecaoMobile> itens) {
+    public PresentationTelaSelecaoResponse(String titulo, List<PresentationItemSelecao> itens) {
         this(titulo, TipoTelaMobile.SELECAO, itens);
     }
 }
