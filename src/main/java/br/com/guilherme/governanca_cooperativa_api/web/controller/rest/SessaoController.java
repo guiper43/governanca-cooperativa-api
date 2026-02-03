@@ -23,6 +23,7 @@ import br.com.guilherme.governanca_cooperativa_api.doc.SessaoControllerDoc;
 public class SessaoController implements SessaoControllerDoc {
     private final SessaoService service;
 
+    @Override
     @PostMapping
     public ResponseEntity<SessaoResponse> abrir(@PathVariable UUID pautaId,
             @Valid @RequestBody(required = false) SessaoRequest request) {

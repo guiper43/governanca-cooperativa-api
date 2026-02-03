@@ -24,6 +24,7 @@ import br.com.guilherme.governanca_cooperativa_api.doc.VotoControllerDoc;
 public class VotoController implements VotoControllerDoc {
     private final VotoService service;
 
+    @Override
     @PostMapping
     public ResponseEntity<VotoResponse> votar(
             @PathVariable UUID pautaId, @Valid @RequestBody VotoRequest request) {

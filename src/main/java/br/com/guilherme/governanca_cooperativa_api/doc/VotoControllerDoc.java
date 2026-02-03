@@ -17,14 +17,14 @@ import java.util.UUID;
 @Tag(name = "Votos", description = "Registro de votos dos associados")
 public interface VotoControllerDoc {
 
-        @Operation(summary = "Registrar Voto", description = "Recebe o voto de um associado em uma pauta. Verifica se a sessão está aberta e o associado apto.")
-        @ApiResponses({
-                        @ApiResponse(responseCode = "201", description = "Voto registrado com sucesso"),
-                        @ApiResponse(responseCode = "400", description = "Dados do voto inválidos"),
-                        @ApiResponse(responseCode = "404", description = "Pauta ou sessão não encontrada"),
-                        @ApiResponse(responseCode = "422", description = "Regra de negócio violada (Sessão encerrada, Associado inapto, Voto duplicado)")
-        })
-        ResponseEntity<VotoResponse> votar(
-                        @Parameter(description = "ID da pauta em votação") @PathVariable UUID pautaId,
-                        @Valid @RequestBody VotoRequest request);
+    @Operation(summary = "Registrar Voto", description = "Recebe o voto de um associado em uma pauta. Verifica se a sessão está aberta e o associado apto.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Voto registrado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Dados do voto inválidos"),
+        @ApiResponse(responseCode = "404", description = "Pauta ou sessão não encontrada"),
+        @ApiResponse(responseCode = "422", description = "Regra de negócio violada (Sessão encerrada, Associado inapto, Voto duplicado)")
+    })
+    ResponseEntity<VotoResponse> votar(
+        @Parameter(description = "ID da pauta em votação") @PathVariable UUID pautaId,
+        @Valid @RequestBody VotoRequest request);
 }

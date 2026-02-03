@@ -4,7 +4,7 @@ import br.com.guilherme.governanca_cooperativa_api.doc.PresentationVotoControlle
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation.VotoTelaAssembler;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.TelaResponse;
+import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +26,7 @@ public class PresentationVotoController implements PresentationVotoControllerDoc
 
     @Override
     @GetMapping("/selecao")
-    public ResponseEntity<TelaResponse> getTelaVotacao(@PathVariable UUID pautaId) {
+    public ResponseEntity<PresentationTelaResponse> getTelaVotacao(@PathVariable UUID pautaId) {
         log.info("Solicitação de tela de votação. pautaId={}", pautaId);
         Pauta pauta = pautaService.buscarEntidade(pautaId);
         var tela = votoTelaAssembler.montarTelaVotacao(pauta);
