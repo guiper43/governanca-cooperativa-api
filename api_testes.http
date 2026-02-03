@@ -1,87 +1,112 @@
 @host = http://localhost:8080
-    @host = http://localhost:8080
 
+###
+GET {{host}}/mobile/v1/pautas/nova
+
+###
 # @name criarPauta
 POST {{host}}/v1/pautas
 Content-Type: application/json
 
 {
-  "descricao": "Assembleia interna para votação de novos membros"
+  "descricao": "Assembleia Geral Extraordinária - Dezembro/2026"
 }
-
-###
 
 @pautaId = {{criarPauta.response.body.id}}
 
 ###
-
 GET {{host}}/v1/pautas/{{pautaId}}
 
 ###
-
 POST {{host}}/v1/pautas/{{pautaId}}/sessoes
 Content-Type: application/json
 
 {
-  "duracaoMinutos": 5
+  "duracaoMinutos": 10
 }
 
 ###
+GET {{host}}/mobile/v1/pautas/{{pautaId}}/votos/selecao
 
-# Voto 1 (SIM)
+
+###
+# Válido com CPF 87868790067
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
 {
-  "associadoId": "88206972070",
+  "associadoId": "87868790067",
   "votoEscolha": "SIM"
 }
 
 ###
-
-# Voto 2 (NAO)
+# Válido com CPF 98189135074
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
 {
-  "associadoId": "72648057007",
+  "associadoId": "98189135074",
   "votoEscolha": "NAO"
 }
 
 ###
+# Válido com CPF 11933950030
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
 
+{
+  "associadoId": "11933950030",
+  "votoEscolha": "SIM"
+}
+
+###
+# Válido com CPF 57376476091
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "57376476091",
+  "votoEscolha": "NAO"
+}
+
+###
+# Inválido com CPF 00000000191
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "00000000191",
+  "votoEscolha": "SIM"
+}
+
+###
 GET {{host}}/v1/pautas/{{pautaId}}/resultado
 
-###
 
-# Voto 3 (SIM) - Tenta votar novamente? (Associados diferentes)
-POST {{host}}/v1/pautas/{{pautaId}}/votos
+###
+# @name criarPautaExpirada
+POST {{host}}/v1/pautas
 Content-Type: application/json
 
 {
-  "associadoId": "66699317046",
+  "descricao": "Pauta Relâmpago para Teste de Timeout"
+}
+
+@pautaExpiradaId = {{criarPautaExpirada.response.body.id}}
+
+###
+POST {{host}}/v1/pautas/{{pautaExpiradaId}}/sessoes
+Content-Type: application/json
+
+{
+    "duracaoMinutos": 1
+}
+
+###
+POST {{host}}/v1/pautas/{{pautaExpiradaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "87868790067",
   "votoEscolha": "SIM"
 }
-
-###
-
-# Voto 4 (SIM)
-POST {{host}}/v1/pautas/{{pautaId}}/votos
-Content-Type: application/json
-
-{
-  "associadoId": "32220199042",
-  "votoEscolha": "SIM"
-}
-
-###
-
-# Voto 5 (NAO)
-POST {{host}}/v1/pautas/{{pautaId}}/votos
-Content-Type: application/json
-
-{
-    "associadoId": "83963057068",
-  "votoEscolha": "NAO"
-}
-
