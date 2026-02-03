@@ -70,7 +70,7 @@ public class VotoService {
         }
         log.info("Voto registrado com sucesso. votoId={} pautaId={} sessaoId={} escolha={}",
                 voto.getId(), pautaId, sessao.getId(), voto.getVotoEscolha());
-        return new VotoResponse(voto.getId(), pauta.getId(), voto.getAssociadoId(), voto.getVotoEscolha());
+        return new VotoResponse(voto.getId(), pauta.getId(), mascararCpf(voto.getAssociadoId()), voto.getVotoEscolha());
     }
 
     private CpfValidationStatus resolverStatusCpf(String cpf) {

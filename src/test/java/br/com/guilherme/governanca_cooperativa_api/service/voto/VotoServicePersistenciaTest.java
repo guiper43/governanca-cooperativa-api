@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.*;
-import static br.com.guilherme.governanca_cooperativa_api.utils.VotoServiceTestDataFactory.requestPadrao;
+import static br.com.guilherme.governanca_cooperativa_api.utils.VotoServiceTestDataFactory.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -67,7 +67,7 @@ class VotoServicePersistenciaTest {
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         when(client.buscarStatusCpf(request.associadoId()))
-            .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
+                .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
 
@@ -84,11 +84,10 @@ class VotoServicePersistenciaTest {
         Voto votoSalvo = votoCaptor.getValue();
 
         assertAll(
-            () -> assertEquals(votoSalvo.getId(), response.id()),
-            () -> assertEquals(pautaId, response.pautaId()),
-            () -> assertEquals(request.associadoId(), response.associadoId()),
-            () -> assertEquals(request.votoEscolha(), response.votoEscolha())
-        );
+                () -> assertEquals(votoSalvo.getId(), response.id()),
+                () -> assertEquals(pautaId, response.pautaId()),
+                () -> assertEquals(CPF_VALIDO_MASCARADO, response.associadoId()),
+                () -> assertEquals(request.votoEscolha(), response.votoEscolha()));
 
         verifyNoInteractions(validator);
         verifyNoMoreInteractions(sessaoRepository, properties, client, pautaService, votoRepository);
@@ -109,7 +108,7 @@ class VotoServicePersistenciaTest {
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         when(client.buscarStatusCpf(request.associadoId()))
-            .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
+                .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
 
