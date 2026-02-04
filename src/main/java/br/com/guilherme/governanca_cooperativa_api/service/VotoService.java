@@ -1,7 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.service;
 
-import br.com.guilherme.governanca_cooperativa_api.client.CpfValidationClient;
-import br.com.guilherme.governanca_cooperativa_api.config.CpfValidationProperties;
+import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 
 import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
@@ -11,10 +10,8 @@ import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidati
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
-import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
-import feign.FeignException;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,11 +29,9 @@ public class VotoService {
     private final VotoRepository votoRepository;
     private final SessaoRepository sessaoRepository;
     private final PautaService pautaService;
-    private final CpfValidationClient client;
-    private final CpfLocalValidator validator;
-    private final CpfValidationProperties properties;
+    private final CpfValidatorGateway cpfValidatorGateway;
 
-    public VotoResponse votar(UUID pautaId, VotoRequest request) {
+    public VotoOutput votar(UUID pautaId, VotoInput request) {
         log.info("Iniciando voto. pautaId={}", pautaId);
         Sessao sessao = sessaoRepository.findByPautaId(pautaId)
                 .orElseThrow(() -> {
@@ -50,7 +45,7 @@ public class VotoService {
             throw new BusinessException("Sessão encerrada");
         }
 
-        CpfValidationStatus statusCpf = resolverStatusCpf(request.associadoId());
+        CpfValidationStatus statusCpf = cpfValidatorGateway.validar(request.associadoId());
 
         if (statusCpf == CpfValidationStatus.UNABLE_TO_VOTE) {
             log.warn("Associado inapto a votar. pautaId={} sessaoId={} cpf={}", pautaId, sessao.getId(),
@@ -70,38 +65,7 @@ public class VotoService {
         }
         log.info("Voto registrado com sucesso. votoId={} pautaId={} sessaoId={} escolha={}",
                 voto.getId(), pautaId, sessao.getId(), voto.getVotoEscolha());
-        return new VotoResponse(voto.getId(), pauta.getId(), mascararCpf(voto.getAssociadoId()), voto.getVotoEscolha());
-    }
-
-    private CpfValidationStatus resolverStatusCpf(String cpf) {
-
-        if (!properties.isEnabled()) {
-            log.info("Validação externa desabilitada. Usando validação local.");
-            return validator.validarStatus(cpf);
-        }
-
-        try {
-            return client.buscarStatusCpf(cpf).status();
-        } catch (FeignException e) {
-
-            if (properties.isFallbackEnabled()) {
-                log.warn("Falha na validação externa. Acionando fallback local. httpStatus={} cpf={}", e.status(),
-                        mascararCpf(cpf));
-                return validator.validarStatus(cpf);
-            }
-
-            switch (e.status()) {
-                case 404 -> {
-                    log.warn("CPF inválido pela validação externa. cpf={}", mascararCpf(cpf));
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "CPF inválido");
-                }
-                default -> {
-                    log.error("Validação externa  indisponível. httpStatus={}", e.status());
-                    throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "Validação de CPF indisponível");
-                }
-            }
-
-        }
+        return new VotoOutput(voto.getId(), pauta.getId(), mascararCpf(voto.getAssociadoId()), voto.getVotoEscolha());
     }
 
 }

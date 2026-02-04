@@ -4,8 +4,8 @@ import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao.SessaoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.sessao.SessaoResponse;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.SessaoInput;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.SessaoOutput;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ public class SessaoService {
     private final SessaoRepository repository;
     private final PautaService pautaService;
 
-    public SessaoResponse abrir(UUID pautaId, SessaoRequest request) {
+    public SessaoOutput abrir(UUID pautaId, SessaoInput request) {
         log.info("Iniciando abertura de sessão. pautaId={} duracaoMinutos={}", pautaId, request.duracaoMinutos());
 
         int duracao = request.duracaoMinutos() == null ? 1 : request.duracaoMinutos();
@@ -46,7 +46,7 @@ public class SessaoService {
         repository.save(sessao);
         log.info("Sessão aberta com sucesso. sessaoId={} pautaId={} fechamento={}", sessao.getId(), pautaId,
                 sessao.getDataFechamento());
-        return new SessaoResponse(sessao.getId(), pauta.getId(), sessao.getDataAbertura(), sessao.getDataFechamento());
+        return new SessaoOutput(sessao.getId(), pauta.getId(), sessao.getDataAbertura(), sessao.getDataFechamento());
     }
 
 }
