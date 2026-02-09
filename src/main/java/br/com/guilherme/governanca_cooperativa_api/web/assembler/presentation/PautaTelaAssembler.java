@@ -19,19 +19,21 @@ public class PautaTelaAssembler {
         log.debug("Montando estrutura visual da tela de cadastro de pauta");
 
         var inputDescricao = new PresentationComponenteVisual(
-            "descricao",
-            "Assunto da Pauta",
-            null,
-            TipoComponenteMobile.INPUT_TEXTO);
+                "descricao",
+                null,
+                null,
+                "Assunto da Pauta",
+                null,
+                TipoComponenteMobile.INPUT_TEXTO);
 
         var botaoCadastrar = new PresentationBotaoAcao(
-            "Cadastrar Pauta",
-            "/v1/pautas",
-            Map.of("descricao", ""));
+                "Cadastrar Pauta",
+                "/v1/pautas",
+                Map.of("descricao", ""));
 
         return new PresentationTelaFormularioResponse(
-            "Nova Pauta",
-            List.of(inputDescricao),
-            botaoCadastrar);
+                "Nova Pauta",
+                List.of(inputDescricao),
+                botaoCadastrar);
     }
 }

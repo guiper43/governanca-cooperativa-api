@@ -1,8 +1,10 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller.rest;
 
+import br.com.guilherme.governanca_cooperativa_api.doc.VotoControllerDoc;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoOutput;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
+import br.com.guilherme.governanca_cooperativa_api.web.assembler.rest.VotoRestAssembler;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
-import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import br.com.guilherme.governanca_cooperativa_api.doc.VotoControllerDoc;
+import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
 
 @RestController
 @RequestMapping("/v1/pautas/{pautaId}/votos")
@@ -23,13 +25,16 @@ import br.com.guilherme.governanca_cooperativa_api.doc.VotoControllerDoc;
 @Slf4j
 public class VotoController implements VotoControllerDoc {
     private final VotoService service;
+    private final VotoRestAssembler votoAssembler;
 
     @Override
     @PostMapping
     public ResponseEntity<VotoResponse> votar(
-            @PathVariable UUID pautaId, @Valid @RequestBody VotoRequest request) {
+        @PathVariable UUID pautaId, @Valid @RequestBody VotoRequest request) {
         log.info("Requisição de voto recebida. pautaId={} associadoId={}", pautaId, mascararCpf(request.associadoId()));
-        var response = service.votar(pautaId, request);
+        var input = votoAssembler.toInput(request);
+        VotoOutput output = service.votar(pautaId, input);
+        var response = votoAssembler.toResponse(output);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

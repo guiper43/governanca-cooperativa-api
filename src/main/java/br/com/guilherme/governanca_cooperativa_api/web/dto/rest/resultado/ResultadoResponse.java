@@ -1,7 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.web.dto.rest.resultado;
 
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.ResultadoStatus;
-
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.ResultadoStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;

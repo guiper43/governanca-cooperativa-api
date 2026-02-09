@@ -1,7 +1,7 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller.presentation;
 
 import br.com.guilherme.governanca_cooperativa_api.doc.PresentationVotoControllerDoc;
-import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.PautaOutput;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation.VotoTelaAssembler;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaResponse;
@@ -28,7 +28,7 @@ public class PresentationVotoController implements PresentationVotoControllerDoc
     @GetMapping("/selecao")
     public ResponseEntity<PresentationTelaResponse> getTelaVotacao(@PathVariable UUID pautaId) {
         log.info("Solicitação de tela de votação. pautaId={}", pautaId);
-        Pauta pauta = pautaService.buscarEntidade(pautaId);
+        PautaOutput pauta = pautaService.buscar(pautaId);
         var tela = votoTelaAssembler.montarTelaVotacao(pauta);
         log.info("Tela de votação retornada. pautaId={}", pautaId);
         return ResponseEntity.ok(tela);

@@ -1,19 +1,16 @@
 package br.com.guilherme.governanca_cooperativa_api.service.voto;
 
-import br.com.guilherme.governanca_cooperativa_api.client.CpfValidationClient;
-import br.com.guilherme.governanca_cooperativa_api.config.CpfValidationProperties;
+import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoOutput;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
-import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.client.CpfValidationResponse;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -43,13 +40,7 @@ class VotoServicePersistenciaTest {
     private PautaService pautaService;
 
     @Mock
-    private CpfValidationClient client;
-
-    @Mock
-    private CpfLocalValidator validator;
-
-    @Mock
-    private CpfValidationProperties properties;
+    private CpfValidatorGateway cpfValidatorGateway;
 
     @InjectMocks
     private VotoService votoService;
@@ -58,26 +49,25 @@ class VotoServicePersistenciaTest {
     void votar_quandoCpfApto_ePersistenciaOk_retornaVotoResponse() {
         UUID pautaId = uuid("88888888-8888-8888-8888-888888888888");
         UUID sessaoId = uuid("12121212-1212-1212-1212-121212121212");
-        VotoRequest request = requestPadrao();
-
-        when(properties.isEnabled()).thenReturn(true);
+        VotoInput request = new VotoInput(requestPadrao().associadoId(), requestPadrao().votoEscolha());
 
         var pauta = pautaPadrao(pautaId);
         var sessao = sessaoAberta(pauta, sessaoId);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
-        when(client.buscarStatusCpf(request.associadoId()))
-                .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
+        when(cpfValidatorGateway.validar(request.associadoId()))
+                .thenReturn(CpfValidationStatus.ABLE_TO_VOTE);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
 
+        when(votoRepository.save(any(Voto.class))).thenAnswer(i -> i.getArguments()[0]);
+
         ArgumentCaptor<Voto> votoCaptor = ArgumentCaptor.forClass(Voto.class);
 
-        VotoResponse response = votoService.votar(pautaId, request);
+        VotoOutput response = votoService.votar(pautaId, request);
 
         verify(sessaoRepository).findByPautaId(pautaId);
-        verify(properties).isEnabled();
-        verify(client).buscarStatusCpf(request.associadoId());
+        verify(cpfValidatorGateway).validar(request.associadoId());
         verify(pautaService).buscarEntidade(pautaId);
         verify(votoRepository).save(votoCaptor.capture());
 
@@ -89,8 +79,7 @@ class VotoServicePersistenciaTest {
                 () -> assertEquals(CPF_VALIDO_MASCARADO, response.associadoId()),
                 () -> assertEquals(request.votoEscolha(), response.votoEscolha()));
 
-        verifyNoInteractions(validator);
-        verifyNoMoreInteractions(sessaoRepository, properties, client, pautaService, votoRepository);
+        verifyNoMoreInteractions(sessaoRepository, cpfValidatorGateway, pautaService, votoRepository);
     }
 
     @Test
@@ -98,17 +87,15 @@ class VotoServicePersistenciaTest {
         UUID pautaId = uuid("99999999-9999-9999-9999-999999999999");
         UUID sessaoId = uuid("34343434-3434-3434-3434-343434343434");
 
-        VotoRequest requestBase = requestPadrao();
-        VotoRequest request = new VotoRequest(requestBase.associadoId(), VotoEscolha.NAO);
-
-        when(properties.isEnabled()).thenReturn(true);
+        VotoInput requestBase = new VotoInput(requestPadrao().associadoId(), requestPadrao().votoEscolha());
+        VotoInput request = new VotoInput(requestBase.associadoId(), VotoEscolha.NAO);
 
         var pauta = pautaPadrao(pautaId);
         var sessao = sessaoAberta(pauta, sessaoId);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
-        when(client.buscarStatusCpf(request.associadoId()))
-                .thenReturn(new CpfValidationResponse(CpfValidationStatus.ABLE_TO_VOTE));
+        when(cpfValidatorGateway.validar(request.associadoId()))
+                .thenReturn(CpfValidationStatus.ABLE_TO_VOTE);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
 
@@ -118,12 +105,10 @@ class VotoServicePersistenciaTest {
         assertEquals("Associado já votou nessa sessão", ex.getMessage());
 
         verify(sessaoRepository).findByPautaId(pautaId);
-        verify(properties).isEnabled();
-        verify(client).buscarStatusCpf(request.associadoId());
+        verify(cpfValidatorGateway).validar(request.associadoId());
         verify(pautaService).buscarEntidade(pautaId);
         verify(votoRepository).save(any(Voto.class));
 
-        verifyNoInteractions(validator);
-        verifyNoMoreInteractions(sessaoRepository, properties, client, pautaService, votoRepository);
+        verifyNoMoreInteractions(sessaoRepository, cpfValidatorGateway, pautaService, votoRepository);
     }
 }

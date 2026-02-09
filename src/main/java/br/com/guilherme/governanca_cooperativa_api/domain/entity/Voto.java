@@ -1,6 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.domain.entity;
 
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -9,12 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(
-    name = "voto", uniqueConstraints = @UniqueConstraint(
-    name = "uk_voto_pauta_associado",
-    columnNames = {"pauta_id", "associado_id"}
-)
-)
+@Table(name = "voto", uniqueConstraints = @UniqueConstraint(name = "uk_voto_pauta_associado", columnNames = {
+        "pauta_id", "associado_id" }))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Voto {
