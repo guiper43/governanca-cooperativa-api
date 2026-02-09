@@ -4,8 +4,8 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record SessaoOutput(
-        UUID id,
-        UUID pautaId,
-        LocalDateTime dataAbertura,
-        LocalDateTime dataFechamento) {
+    UUID id,
+    UUID pautaId,
+    LocalDateTime dataAbertura,
+    LocalDateTime dataFechamento) {
 }
