@@ -2,11 +2,11 @@ package br.com.guilherme.governanca_cooperativa_api.service;
 
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.ResultadoStatus;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.ResultadoStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
-import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.resultado.ResultadoResponse;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.ResultadoOutput;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,6 @@ import java.util.UUID;
 import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
 
 @ExtendWith(MockitoExtension.class)
 class ResultadoServiceTest {
@@ -43,7 +42,7 @@ class ResultadoServiceTest {
         UUID pautaId = uuid("11111111-1111-1111-1111-111111111111");
 
         when(pautaService.buscarEntidade(pautaId))
-            .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada"));
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada"));
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.consultar(pautaId));
 
@@ -52,9 +51,8 @@ class ResultadoServiceTest {
         verifyNoInteractions(votoRepository, sessaoRepository);
 
         assertAll(
-            () -> assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode()),
-            () -> assertEquals("Pauta não encontrada", ex.getReason())
-        );
+                () -> assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode()),
+                () -> assertEquals("Pauta não encontrada", ex.getReason()));
     }
 
     @Test
@@ -73,10 +71,9 @@ class ResultadoServiceTest {
         verifyNoInteractions(votoRepository);
 
         assertAll(
-            () -> assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode()),
-            () -> assertEquals("Sessão não encontrada para a pauta", ex.getReason()));
+                () -> assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode()),
+                () -> assertEquals("Sessão não encontrada para a pauta", ex.getReason()));
     }
-
 
     @Test
     void consultar_sessaoEmAndamento_retornaEmAndamento() {
@@ -90,7 +87,7 @@ class ResultadoServiceTest {
         when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(2L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
-        ResultadoResponse response = service.consultar(pautaId);
+        ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
         verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
@@ -99,12 +96,11 @@ class ResultadoServiceTest {
         verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
 
         assertAll(
-            () -> assertNotNull(response),
-            () -> assertEquals(pautaId, response.pautaId()),
-            () -> assertEquals(10L, response.totalSim()),
-            () -> assertEquals(2L, response.totalNao()),
-            () -> assertEquals(ResultadoStatus.EM_ANDAMENTO, response.status())
-        );
+                () -> assertNotNull(response),
+                () -> assertEquals(pautaId, response.pautaId()),
+                () -> assertEquals(10L, response.votosSim()),
+                () -> assertEquals(2L, response.votosNao()),
+                () -> assertEquals(ResultadoStatus.EM_ANDAMENTO, response.status()));
     }
 
     @Test
@@ -119,7 +115,7 @@ class ResultadoServiceTest {
         when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(1L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
-        ResultadoResponse response = service.consultar(pautaId);
+        ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
         verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
@@ -128,12 +124,11 @@ class ResultadoServiceTest {
         verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
 
         assertAll(
-            () -> assertNotNull(response),
-            () -> assertEquals(pautaId, response.pautaId()),
-            () -> assertEquals(5L, response.totalSim()),
-            () -> assertEquals(1L, response.totalNao()),
-            () -> assertEquals(ResultadoStatus.APROVADA, response.status())
-        );
+                () -> assertNotNull(response),
+                () -> assertEquals(pautaId, response.pautaId()),
+                () -> assertEquals(5L, response.votosSim()),
+                () -> assertEquals(1L, response.votosNao()),
+                () -> assertEquals(ResultadoStatus.APROVADA, response.status()));
     }
 
     @Test
@@ -148,7 +143,7 @@ class ResultadoServiceTest {
         when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(7L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
-        ResultadoResponse response = service.consultar(pautaId);
+        ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
         verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
@@ -157,12 +152,11 @@ class ResultadoServiceTest {
         verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
 
         assertAll(
-            () -> assertNotNull(response),
-            () -> assertEquals(pautaId, response.pautaId()),
-            () -> assertEquals(2L, response.totalSim()),
-            () -> assertEquals(7L, response.totalNao()),
-            () -> assertEquals(ResultadoStatus.REPROVADA, response.status())
-        );
+                () -> assertNotNull(response),
+                () -> assertEquals(pautaId, response.pautaId()),
+                () -> assertEquals(2L, response.votosSim()),
+                () -> assertEquals(7L, response.votosNao()),
+                () -> assertEquals(ResultadoStatus.REPROVADA, response.status()));
     }
 
     @Test
@@ -177,7 +171,7 @@ class ResultadoServiceTest {
         when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(3L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
-        ResultadoResponse response = service.consultar(pautaId);
+        ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
         verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
@@ -186,11 +180,10 @@ class ResultadoServiceTest {
         verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
 
         assertAll(
-            () -> assertNotNull(response),
-            () -> assertEquals(pautaId, response.pautaId()),
-            () -> assertEquals(3L, response.totalSim()),
-            () -> assertEquals(3L, response.totalNao()),
-            () -> assertEquals(ResultadoStatus.EMPATE, response.status())
-        );
+                () -> assertNotNull(response),
+                () -> assertEquals(pautaId, response.pautaId()),
+                () -> assertEquals(3L, response.votosSim()),
+                () -> assertEquals(3L, response.votosNao()),
+                () -> assertEquals(ResultadoStatus.EMPATE, response.status()));
     }
 }

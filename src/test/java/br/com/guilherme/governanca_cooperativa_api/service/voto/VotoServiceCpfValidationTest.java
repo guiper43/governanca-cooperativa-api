@@ -2,7 +2,7 @@ package br.com.guilherme.governanca_cooperativa_api.service.voto;
 
 import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;

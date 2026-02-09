@@ -29,23 +29,23 @@ class PautaTelaAssemblerTest {
         PresentationTelaFormularioResponse telaForm = (PresentationTelaFormularioResponse) response;
 
         assertAll(
-            () -> assertEquals("Nova Pauta", telaForm.titulo()),
-            () -> assertEquals(TipoTelaMobile.FORMULARIO, telaForm.tipo()),
-            () -> assertNotNull(telaForm.itens()),
-            () -> assertEquals(1, telaForm.itens().size()),
-            () -> assertNotNull(telaForm.botaoOk()));
+                () -> assertEquals("Nova Pauta", telaForm.titulo()),
+                () -> assertEquals(TipoTelaMobile.FORMULARIO, telaForm.tipo()),
+                () -> assertNotNull(telaForm.itens()),
+                () -> assertEquals(1, telaForm.itens().size()),
+                () -> assertNotNull(telaForm.botaoOk()));
 
         PresentationComponenteVisual input = telaForm.itens().get(0);
         assertAll(
-            () -> assertEquals("descricao", input.id()),
-            () -> assertEquals("Assunto da Pauta", input.titulo()),
-            () -> assertEquals(TipoComponenteMobile.INPUT_TEXTO, input.tipo()));
+                () -> assertEquals("descricao", input.idCampoTexto()),
+                () -> assertEquals("Assunto da Pauta", input.titulo()),
+                () -> assertEquals(TipoComponenteMobile.INPUT_TEXTO, input.tipo()));
 
         PresentationBotaoAcao botao = telaForm.botaoOk();
         assertAll(
-            () -> assertEquals("Cadastrar Pauta", botao.texto()),
-            () -> assertEquals("/v1/pautas", botao.url()),
-            () -> assertNotNull(botao.body()),
-            () -> assertTrue(botao.body().containsKey("descricao")));
+                () -> assertEquals("Cadastrar Pauta", botao.texto()),
+                () -> assertEquals("/v1/pautas", botao.url()),
+                () -> assertNotNull(botao.body()),
+                () -> assertTrue(botao.body().containsKey("descricao")));
     }
 }

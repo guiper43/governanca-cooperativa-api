@@ -4,8 +4,8 @@ import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorG
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoOutput;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
@@ -59,6 +59,8 @@ class VotoServicePersistenciaTest {
                 .thenReturn(CpfValidationStatus.ABLE_TO_VOTE);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
+
+        when(votoRepository.save(any(Voto.class))).thenAnswer(i -> i.getArguments()[0]);
 
         ArgumentCaptor<Voto> votoCaptor = ArgumentCaptor.forClass(Voto.class);
 

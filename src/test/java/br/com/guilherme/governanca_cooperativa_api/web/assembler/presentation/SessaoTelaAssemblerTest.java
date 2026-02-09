@@ -1,6 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation;
 
-import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.PautaOutput;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.presentation.TipoComponenteMobile;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.presentation.TipoTelaMobile;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationBotaoAcao;
@@ -14,45 +14,44 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.UUID;
 
-import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.pauta;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SessaoTelaAssemblerTest {
 
-    @InjectMocks
-    private SessaoTelaAssembler assembler;
+        @InjectMocks
+        private SessaoTelaAssembler assembler;
 
-    @Test
-    void montarTelaAbertura_sucesso_retornaTelaComNomeDaPauta() {
-        UUID pautaId = UUID.randomUUID();
-        Pauta pauta = pauta(pautaId, "Pauta Teste Assemble");
+        @Test
+        void montarTelaAbertura_sucesso_retornaTelaComNomeDaPauta() {
+                UUID pautaId = UUID.randomUUID();
+                PautaOutput pauta = new PautaOutput(pautaId, "Pauta Teste Assemble");
 
-        PresentationTelaResponse response = assembler.montarTelaAbertura(pauta);
+                PresentationTelaResponse response = assembler.montarTelaAbertura(pauta);
 
-        assertNotNull(response);
-        assertInstanceOf(PresentationTelaFormularioResponse.class, response);
+                assertNotNull(response);
+                assertInstanceOf(PresentationTelaFormularioResponse.class, response);
 
-        PresentationTelaFormularioResponse telaForm = (PresentationTelaFormularioResponse) response;
+                PresentationTelaFormularioResponse telaForm = (PresentationTelaFormularioResponse) response;
 
-        assertAll(
-            () -> assertEquals("Abrir Sessão: Pauta Teste Assemble", telaForm.titulo()),
-            () -> assertEquals(TipoTelaMobile.FORMULARIO, telaForm.tipo()),
-            () -> assertNotNull(telaForm.itens()),
-            () -> assertEquals(1, telaForm.itens().size()),
-            () -> assertNotNull(telaForm.botaoOk()));
+                assertAll(
+                                () -> assertEquals("Abrir Sessão: Pauta Teste Assemble", telaForm.titulo()),
+                                () -> assertEquals(TipoTelaMobile.FORMULARIO, telaForm.tipo()),
+                                () -> assertNotNull(telaForm.itens()),
+                                () -> assertEquals(1, telaForm.itens().size()),
+                                () -> assertNotNull(telaForm.botaoOk()));
 
-        PresentationComponenteVisual input = telaForm.itens().get(0);
-        assertAll(
-            () -> assertEquals("duracaoMinutos", input.id()),
-            () -> assertEquals("1", input.valor()),
-            () -> assertEquals(TipoComponenteMobile.INPUT_NUMERO, input.tipo()));
+                PresentationComponenteVisual input = telaForm.itens().get(0);
+                assertAll(
+                                () -> assertEquals("duracaoMinutos", input.idCampoNumerico()),
+                                () -> assertEquals("1", input.valor()),
+                                () -> assertEquals(TipoComponenteMobile.INPUT_NUMERO, input.tipo()));
 
-        PresentationBotaoAcao botao = telaForm.botaoOk();
-        assertAll(
-            () -> assertEquals("Iniciar Sessão", botao.texto()),
-            () -> assertEquals("/v1/pautas/" + pautaId + "/sessoes", botao.url()),
-            () -> assertNotNull(botao.body()),
-            () -> assertTrue(botao.body().containsKey("duracaoMinutos")));
-    }
+                PresentationBotaoAcao botao = telaForm.botaoOk();
+                assertAll(
+                                () -> assertEquals("Iniciar Sessão", botao.texto()),
+                                () -> assertEquals("/v1/pautas/" + pautaId + "/sessoes", botao.url()),
+                                () -> assertNotNull(botao.body()),
+                                () -> assertTrue(botao.body().containsKey("duracaoMinutos")));
+        }
 }

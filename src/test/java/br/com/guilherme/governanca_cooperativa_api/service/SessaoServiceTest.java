@@ -45,6 +45,7 @@ class SessaoServiceTest {
 
         when(repository.findByPautaId(pautaId)).thenReturn(Optional.empty());
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
+        when(repository.save(any(Sessao.class))).thenAnswer(i -> i.getArguments()[0]);
 
         SessaoOutput response = service.abrir(pautaId, request);
 
@@ -80,6 +81,7 @@ class SessaoServiceTest {
 
         when(repository.findByPautaId(pautaId)).thenReturn(Optional.empty());
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
+        when(repository.save(any(Sessao.class))).thenAnswer(i -> i.getArguments()[0]);
 
         SessaoOutput response = service.abrir(pautaId, request);
 

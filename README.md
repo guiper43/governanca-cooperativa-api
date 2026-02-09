@@ -33,6 +33,8 @@ docker-compose up -d
 ```
 
 > **Nota**: O projeto utiliza **Maven Wrapper** para garantir que todos os desenvolvedores e pipelines de CI/CD utilizem a mesma versão do Maven ("Universal"). Caso precise regenerar os scripts ou atualizar a versão, execute: `mvn -N wrapper:wrapper`.
+>
+> **Infraestrutura**: O arquivo `.gitattributes` foi incluído para forçar padronização de quebras de linha (LF) nos scripts de build, prevenindo erros de execução em ambientes Linux/CI ao commitar via Windows.
 
 ## Como Testar
 Para facilitar a validação manual dos fluxos de ponta a ponta (Mobile e REST), o projeto inclui um arquivo de testes HTTP executável na raiz.
@@ -59,7 +61,7 @@ Isso garante que as assembleias e votações não sejam interrompidas por falhas
 ## Notas de Configuração e Segurança
 O arquivo `application.yaml` contendo as credenciais de banco de dados foi intencionalmente versionado neste repositório.
 
-Esta decisão visa facilitar a **avaliação técnica imediata** ("Clone and Run"), eliminando a necessidade de configuração de ambiente por parte do avaliador. Em um ambiente produtivo real, estas credenciais seriam injetadas via variáveis de ambiente ou gerenciadores de segredos (como AWS Secrets Manager), jamais expostas no controle de versão.
+Esta decisão visa facilitar a **execução local imediata** (Quick Start) e demonstração do projeto, eliminando a necessidade de configuração complexa de ambiente inicial. Em um cenário produtivo, estas credenciais seriam gerenciadas via variáveis de ambiente ou Vaults corporativos (AWS Secrets Manager, HashiCorp Vault), seguindo as práticas de *Twelve-Factor App*.
 
 ## Endpoints
 A documentação interativa e especificação da API estão disponíveis no Swagger UI:

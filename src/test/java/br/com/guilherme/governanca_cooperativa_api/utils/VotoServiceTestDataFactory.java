@@ -1,6 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.utils;
 
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
 
 public class VotoServiceTestDataFactory {

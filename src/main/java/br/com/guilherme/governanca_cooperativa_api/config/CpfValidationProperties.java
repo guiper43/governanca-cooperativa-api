@@ -6,10 +6,10 @@ import java.util.Set;
 
 @ConfigurationProperties(prefix = "integrations.cpf-validator")
 public record CpfValidationProperties(
-        String url,
-        Boolean enabled,
-        Boolean fallbackEnabled,
-        Set<String> unableCpfs) {
+    String url,
+    Boolean enabled,
+    Boolean fallbackEnabled,
+    Set<String> unableCpfs) {
 
     public CpfValidationProperties {
         unableCpfs = unableCpfs == null ? Set.of() : unableCpfs;
