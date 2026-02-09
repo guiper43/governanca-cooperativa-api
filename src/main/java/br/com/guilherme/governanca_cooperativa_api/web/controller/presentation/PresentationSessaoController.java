@@ -1,7 +1,7 @@
 package br.com.guilherme.governanca_cooperativa_api.web.controller.presentation;
 
 import br.com.guilherme.governanca_cooperativa_api.doc.PresentationSessaoControllerDoc;
-import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.PautaOutput;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.web.assembler.presentation.SessaoTelaAssembler;
 import br.com.guilherme.governanca_cooperativa_api.web.dto.presentation.PresentationTelaResponse;
@@ -28,7 +28,7 @@ public class PresentationSessaoController implements PresentationSessaoControlle
     @GetMapping("/nova")
     public ResponseEntity<PresentationTelaResponse> getTelaAberturaSessao(@PathVariable UUID pautaId) {
         log.info("Solicitação de tela de abertura de sessão. pautaId={}", pautaId);
-        Pauta pauta = pautaService.buscarEntidade(pautaId);
+        PautaOutput pauta = pautaService.buscar(pautaId);
         var tela = sessaoTelaAssembler.montarTelaAbertura(pauta);
         log.info("Tela de abertura de sessão retornada. pautaId={}", pautaId);
         return ResponseEntity.ok(tela);

@@ -19,12 +19,12 @@ public interface SessaoControllerDoc {
 
     @Operation(summary = "Abrir Sessão", description = "Abre uma sessão de votação para uma pauta específica. Se a duração não for informada, o padrão é 1 minuto.")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Sessão aberta com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Duração inválida ou dados incorretos"),
-            @ApiResponse(responseCode = "404", description = "Pauta não encontrada"),
-            @ApiResponse(responseCode = "409", description = "Já existe uma sessão para esta pauta")
+        @ApiResponse(responseCode = "201", description = "Sessão aberta com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Duração inválida ou dados incorretos"),
+        @ApiResponse(responseCode = "404", description = "Pauta não encontrada"),
+        @ApiResponse(responseCode = "409", description = "Já existe uma sessão para esta pauta")
     })
     ResponseEntity<SessaoResponse> abrir(
-            @Parameter(description = "ID da pauta que receberá a sessão") @PathVariable UUID pautaId,
-            @Valid @RequestBody(required = false) SessaoRequest request);
+        @Parameter(description = "ID da pauta que receberá a sessão") @PathVariable UUID pautaId,
+        @Valid @RequestBody(required = false) SessaoRequest request);
 }

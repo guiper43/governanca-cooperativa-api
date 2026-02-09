@@ -1,7 +1,6 @@
 package br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto;
 
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.VotoEscolha;
-
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.UUID;

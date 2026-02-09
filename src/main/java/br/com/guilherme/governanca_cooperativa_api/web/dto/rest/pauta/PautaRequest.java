@@ -4,5 +4,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 public record PautaRequest(
-        @Schema(description = "Descrição/Tema da pauta", example = "Reforma do Estatuto", requiredMode = Schema.RequiredMode.REQUIRED) @NotBlank String descricao) {
+    @Schema(description = "Descrição/Tema da pauta", example = "Reforma do Estatuto", requiredMode = Schema.RequiredMode.REQUIRED) @NotBlank String descricao) {
 }
