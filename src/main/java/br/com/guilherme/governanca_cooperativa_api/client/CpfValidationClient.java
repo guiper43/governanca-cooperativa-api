@@ -1,5 +1,5 @@
-    package br.com.guilherme.governanca_cooperativa_api.client;
-    
+package br.com.guilherme.governanca_cooperativa_api.client;
+
 import br.com.guilherme.governanca_cooperativa_api.client.dto.CpfValidationResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;

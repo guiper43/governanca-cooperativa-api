@@ -2,7 +2,7 @@ package br.com.guilherme.governanca_cooperativa_api.infrastructure.gateway;
 
 import br.com.guilherme.governanca_cooperativa_api.client.CpfValidationClient;
 import br.com.guilherme.governanca_cooperativa_api.config.CpfValidationProperties;
-import br.com.guilherme.governanca_cooperativa_api.domain.enums.rest.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
 import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import br.com.guilherme.governanca_cooperativa_api.utils.validation.CpfLocalValidator;
 import feign.FeignException;
