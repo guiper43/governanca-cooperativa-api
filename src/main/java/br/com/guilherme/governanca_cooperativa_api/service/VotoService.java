@@ -3,11 +3,13 @@ package br.com.guilherme.governanca_cooperativa_api.service;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoOutput;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
+import br.com.guilherme.governanca_cooperativa_api.domain.entity.RegistroParticipacao;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
-import br.com.guilherme.governanca_cooperativa_api.domain.entity.Voto;
+import br.com.guilherme.governanca_cooperativa_api.domain.entity.UrnaVoto;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.RegistroParticipacaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
-import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.UrnaVotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +19,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.HexFormat;
 import java.util.UUID;
-
-import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class VotoService {
-    private final VotoRepository votoRepository;
+    private final RegistroParticipacaoRepository registroParticipacaoRepository;
+    private final UrnaVotoRepository urnaVotoRepository;
     private final SessaoRepository sessaoRepository;
     private final PautaService pautaService;
     private final CpfValidatorGateway cpfValidatorGateway;
@@ -39,47 +44,68 @@ public class VotoService {
         validarAssociado(request.associadoId(), pautaId, sessao.getId());
 
         Pauta pauta = pautaService.buscarEntidade(pautaId);
-        Voto voto = criarEPersistirVoto(pauta, sessao, request);
+        UUID votoId = registrarParticipacaoEDepositarCedula(pauta, sessao, request);
 
-        log.info("Voto registrado com sucesso. votoId={} pautaId={} sessaoId={} escolha={}",
-                voto.getId(), pautaId, sessao.getId(), voto.getVotoEscolha());
-        return new VotoOutput(voto.getId(), pauta.getId(), mascararCpf(voto.getAssociadoId()), voto.getVotoEscolha());
+        log.info("Voto registrado com sucesso. votoId={} pautaId={} sessaoId={}",
+                votoId, pautaId, sessao.getId());
+        return new VotoOutput(votoId, pauta.getId(), "REGISTRADO");
     }
 
     private Sessao buscarSessaoAberta(UUID pautaId) {
         return sessaoRepository.findByPautaId(pautaId)
                 .orElseThrow(() -> {
-                    log.warn("Sessão não encontrada para pauta. pautaId={}", pautaId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta");
+                    log.warn("Sessao nao encontrada para pauta. pautaId={}", pautaId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessao nao encontrada para a pauta");
                 });
     }
 
     private void validarHorarioSessao(Sessao sessao, UUID pautaId) {
         if (LocalDateTime.now().isAfter(sessao.getDataFechamento())) {
-            log.warn("Sessão encerrada. pautaId={} sessaoId={} dataFechamento={}", pautaId, sessao.getId(),
+            log.warn("Sessao encerrada. pautaId={} sessaoId={} dataFechamento={}", pautaId, sessao.getId(),
                     sessao.getDataFechamento());
-            throw new BusinessException("Sessão encerrada");
+            throw new BusinessException("Sessao encerrada");
         }
     }
 
     private void validarAssociado(String associadoId, UUID pautaId, UUID sessaoId) {
         CpfValidationStatus statusCpf = cpfValidatorGateway.validar(associadoId);
         if (statusCpf == CpfValidationStatus.UNABLE_TO_VOTE) {
-            log.warn("Associado inapto a votar. pautaId={} sessaoId={} cpf={}", pautaId, sessaoId,
-                    mascararCpf(associadoId));
-            throw new BusinessException("CPF não está apto a votar");
+            log.warn("Associado inapto a votar. pautaId={} sessaoId={}", pautaId, sessaoId);
+            throw new BusinessException("CPF nao esta apto a votar");
         }
     }
 
-    private Voto criarEPersistirVoto(Pauta pauta, Sessao sessao, VotoInput request) {
-        UUID id = UUID.randomUUID();
-        Voto voto = Voto.criar(id, pauta, request.associadoId(), request.votoEscolha());
+    private UUID registrarParticipacaoEDepositarCedula(Pauta pauta, Sessao sessao, VotoInput request) {
+        if (registroParticipacaoRepository.existsByPautaIdAndAssociadoId(pauta.getId(), request.associadoId())) {
+            log.warn("Tentativa de voto duplicado. pautaId={} sessaoId={}", pauta.getId(), sessao.getId());
+            throw new BusinessException("Associado ja votou nessa sessao");
+        }
+
+        UUID votoId = UUID.randomUUID();
+        RegistroParticipacao registroParticipacao = RegistroParticipacao.emitir(UUID.randomUUID(), pauta,
+                request.associadoId(), gerarTokenHash());
+        UrnaVoto urnaVoto = UrnaVoto.depositar(votoId, pauta, request.votoEscolha());
+
         try {
-            return votoRepository.save(voto);
+            registroParticipacaoRepository.save(registroParticipacao);
+            registroParticipacao.consumir();
+            registroParticipacaoRepository.save(registroParticipacao);
+            urnaVotoRepository.save(urnaVoto);
+            return votoId;
         } catch (DataIntegrityViolationException e) {
             log.warn("Tentativa de voto duplicado. pautaId={} sessaoId={}", pauta.getId(), sessao.getId());
-            throw new BusinessException("Associado já votou nessa sessão");
+            throw new BusinessException("Associado ja votou nessa sessao");
         }
     }
 
+    private String gerarTokenHash() {
+        try {
+            String token = UUID.randomUUID().toString();
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(token.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Algoritmo de hash nao disponivel", e);
+        }
+    }
 }
