@@ -1,12 +1,13 @@
 package br.com.guilherme.governanca_cooperativa_api.service.voto;
 
-import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.RegistroParticipacaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
-import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.UrnaVotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
+import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,17 +19,25 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.*;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.pautaPadrao;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.sessaoEncerrada;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.uuid;
 import static br.com.guilherme.governanca_cooperativa_api.utils.VotoServiceTestDataFactory.requestPadrao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VotoServiceSessaoTest {
 
     @Mock
-    private VotoRepository votoRepository;
+    private RegistroParticipacaoRepository registroParticipacaoRepository;
+
+    @Mock
+    private UrnaVotoRepository urnaVotoRepository;
 
     @Mock
     private SessaoRepository sessaoRepository;
@@ -53,11 +62,11 @@ class VotoServiceSessaoTest {
                 () -> votoService.votar(pautaId, request));
 
         assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode());
-        assertEquals("Sessão não encontrada para a pauta", ex.getReason());
+        assertEquals("Sessao nao encontrada para a pauta", ex.getReason());
 
         verify(sessaoRepository).findByPautaId(pautaId);
         verifyNoMoreInteractions(sessaoRepository);
-        verifyNoInteractions(votoRepository, pautaService, cpfValidatorGateway);
+        verifyNoInteractions(registroParticipacaoRepository, urnaVotoRepository, pautaService, cpfValidatorGateway);
     }
 
     @Test
@@ -71,10 +80,10 @@ class VotoServiceSessaoTest {
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         BusinessException ex = assertThrows(BusinessException.class, () -> votoService.votar(pautaId, request));
-        assertEquals("Sessão encerrada", ex.getMessage());
+        assertEquals("Sessao encerrada", ex.getMessage());
 
         verify(sessaoRepository).findByPautaId(pautaId);
         verifyNoMoreInteractions(sessaoRepository);
-        verifyNoInteractions(votoRepository, pautaService, cpfValidatorGateway);
+        verifyNoInteractions(registroParticipacaoRepository, urnaVotoRepository, pautaService, cpfValidatorGateway);
     }
 }

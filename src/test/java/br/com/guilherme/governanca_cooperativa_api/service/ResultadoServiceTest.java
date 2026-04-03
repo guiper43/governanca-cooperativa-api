@@ -1,12 +1,12 @@
 package br.com.guilherme.governanca_cooperativa_api.service;
 
+import br.com.guilherme.governanca_cooperativa_api.domain.dto.ResultadoOutput;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Pauta;
 import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.ResultadoStatus;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
-import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
-import br.com.guilherme.governanca_cooperativa_api.domain.dto.ResultadoOutput;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.UrnaVotoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,15 +18,25 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.pautaPadrao;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.sessaoAberta;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.sessaoEncerrada;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.uuid;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ResultadoServiceTest {
 
     @Mock
-    private VotoRepository votoRepository;
+    private UrnaVotoRepository urnaVotoRepository;
 
     @Mock
     private SessaoRepository sessaoRepository;
@@ -42,17 +52,17 @@ class ResultadoServiceTest {
         UUID pautaId = uuid("11111111-1111-1111-1111-111111111111");
 
         when(pautaService.buscarEntidade(pautaId))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta não encontrada"));
+                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "Pauta nao encontrada"));
 
         ResponseStatusException ex = assertThrows(ResponseStatusException.class, () -> service.consultar(pautaId));
 
         verify(pautaService).buscarEntidade(pautaId);
         verifyNoMoreInteractions(pautaService);
-        verifyNoInteractions(votoRepository, sessaoRepository);
+        verifyNoInteractions(urnaVotoRepository, sessaoRepository);
 
         assertAll(
                 () -> assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode()),
-                () -> assertEquals("Pauta não encontrada", ex.getReason()));
+                () -> assertEquals("Pauta nao encontrada", ex.getReason()));
     }
 
     @Test
@@ -68,38 +78,35 @@ class ResultadoServiceTest {
         verify(pautaService).buscarEntidade(pautaId);
         verify(sessaoRepository).findByPautaId(pautaId);
         verifyNoMoreInteractions(pautaService, sessaoRepository);
-        verifyNoInteractions(votoRepository);
+        verifyNoInteractions(urnaVotoRepository);
 
         assertAll(
                 () -> assertEquals(HttpStatus.NOT_FOUND, ex.getStatusCode()),
-                () -> assertEquals("Sessão não encontrada para a pauta", ex.getReason()));
+                () -> assertEquals("Sessao nao encontrada para a pauta", ex.getReason()));
     }
 
     @Test
-    void consultar_sessaoEmAndamento_retornaEmAndamento() {
+    void consultar_sessaoEmAndamento_retornaEmAndamentoSemParcial() {
         UUID pautaId = uuid("33333333-3333-3333-3333-333333333333");
         UUID sessaoId = uuid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
         Pauta pauta = pautaPadrao(pautaId);
         Sessao sessao = sessaoAberta(pauta, sessaoId);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(10L);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(2L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
         verify(sessaoRepository).findByPautaId(pautaId);
-        verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
+        verifyNoMoreInteractions(pautaService, sessaoRepository);
+        verifyNoInteractions(urnaVotoRepository);
 
         assertAll(
                 () -> assertNotNull(response),
                 () -> assertEquals(pautaId, response.pautaId()),
-                () -> assertEquals(10L, response.votosSim()),
-                () -> assertEquals(2L, response.votosNao()),
+                () -> assertNull(response.votosSim()),
+                () -> assertNull(response.votosNao()),
                 () -> assertEquals(ResultadoStatus.EM_ANDAMENTO, response.status()));
     }
 
@@ -111,17 +118,17 @@ class ResultadoServiceTest {
         Sessao sessao = sessaoEncerrada(pauta, sessaoId);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(5L);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(1L);
+        when(urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(5L);
+        when(urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(1L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
+        verify(urnaVotoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
+        verify(urnaVotoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
         verify(sessaoRepository).findByPautaId(pautaId);
-        verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
+        verifyNoMoreInteractions(pautaService, urnaVotoRepository, sessaoRepository);
 
         assertAll(
                 () -> assertNotNull(response),
@@ -139,17 +146,17 @@ class ResultadoServiceTest {
         Sessao sessao = sessaoEncerrada(pauta, sessaoId);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(2L);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(7L);
+        when(urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(2L);
+        when(urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(7L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
+        verify(urnaVotoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
+        verify(urnaVotoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
         verify(sessaoRepository).findByPautaId(pautaId);
-        verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
+        verifyNoMoreInteractions(pautaService, urnaVotoRepository, sessaoRepository);
 
         assertAll(
                 () -> assertNotNull(response),
@@ -167,17 +174,17 @@ class ResultadoServiceTest {
         Sessao sessao = sessaoEncerrada(pauta, sessaoId);
 
         when(pautaService.buscarEntidade(pautaId)).thenReturn(pauta);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(3L);
-        when(votoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(3L);
+        when(urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM)).thenReturn(3L);
+        when(urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO)).thenReturn(3L);
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
 
         ResultadoOutput response = service.consultar(pautaId);
 
         verify(pautaService).buscarEntidade(pautaId);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
-        verify(votoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
+        verify(urnaVotoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.SIM);
+        verify(urnaVotoRepository).countByPautaIdAndVotoEscolha(pautaId, VotoEscolha.NAO);
         verify(sessaoRepository).findByPautaId(pautaId);
-        verifyNoMoreInteractions(pautaService, votoRepository, sessaoRepository);
+        verifyNoMoreInteractions(pautaService, urnaVotoRepository, sessaoRepository);
 
         assertAll(
                 () -> assertNotNull(response),

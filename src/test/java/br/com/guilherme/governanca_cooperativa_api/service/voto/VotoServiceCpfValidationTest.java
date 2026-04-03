@@ -1,34 +1,51 @@
 package br.com.guilherme.governanca_cooperativa_api.service.voto;
 
-import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import br.com.guilherme.governanca_cooperativa_api.domain.dto.VotoInput;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.CpfValidationStatus;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.RegistroParticipacaoRepository;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.UrnaVotoRepository;
 import br.com.guilherme.governanca_cooperativa_api.exception.BusinessException;
 import br.com.guilherme.governanca_cooperativa_api.service.PautaService;
 import br.com.guilherme.governanca_cooperativa_api.service.VotoService;
+import br.com.guilherme.governanca_cooperativa_api.service.gateway.CpfValidatorGateway;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.util.Optional;
 import java.util.UUID;
-import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.*;
+
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.pautaPadrao;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.sessaoAberta;
+import static br.com.guilherme.governanca_cooperativa_api.utils.DomainTestDataFactory.uuid;
 import static br.com.guilherme.governanca_cooperativa_api.utils.VotoServiceTestDataFactory.requestPadrao;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VotoServiceCpfValidationTest {
 
     @Mock
+    private RegistroParticipacaoRepository registroParticipacaoRepository;
+
+    @Mock
+    private UrnaVotoRepository urnaVotoRepository;
+
+    @Mock
     private SessaoRepository sessaoRepository;
+
     @Mock
     private PautaService pautaService;
+
     @Mock
     private CpfValidatorGateway cpfValidatorGateway;
+
     @InjectMocks
     private VotoService votoService;
 
@@ -40,13 +57,13 @@ class VotoServiceCpfValidationTest {
         var pauta = pautaPadrao(pautaId);
         var sessao = sessaoAberta(pauta, UUID.randomUUID());
         when(sessaoRepository.findByPautaId(pautaId)).thenReturn(Optional.of(sessao));
-
-        when(cpfValidatorGateway.validar(request.associadoId()))
-                .thenReturn(CpfValidationStatus.UNABLE_TO_VOTE);
+        when(cpfValidatorGateway.validar(request.associadoId())).thenReturn(CpfValidationStatus.UNABLE_TO_VOTE);
 
         BusinessException ex = assertThrows(BusinessException.class, () -> votoService.votar(pautaId, request));
-        assertEquals("CPF não está apto a votar", ex.getMessage());
+        assertEquals("CPF nao esta apto a votar", ex.getMessage());
 
+        verify(sessaoRepository).findByPautaId(pautaId);
         verify(cpfValidatorGateway).validar(request.associadoId());
+        verifyNoInteractions(registroParticipacaoRepository, urnaVotoRepository, pautaService);
     }
 }
