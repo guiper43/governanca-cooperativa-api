@@ -16,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
-
 @RestController
 @RequestMapping("/v1/pautas/{pautaId}/votos")
 @RequiredArgsConstructor
@@ -30,8 +28,8 @@ public class VotoController implements VotoControllerDoc {
     @Override
     @PostMapping
     public ResponseEntity<VotoResponse> votar(
-        @PathVariable UUID pautaId, @Valid @RequestBody VotoRequest request) {
-        log.info("Requisição de voto recebida. pautaId={} associadoId={}", pautaId, mascararCpf(request.associadoId()));
+            @PathVariable UUID pautaId, @Valid @RequestBody VotoRequest request) {
+        log.info("Requisicao de voto recebida. pautaId={}", pautaId);
         var input = votoAssembler.toInput(request);
         VotoOutput output = service.votar(pautaId, input);
         var response = votoAssembler.toResponse(output);

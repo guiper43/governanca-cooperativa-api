@@ -6,8 +6,6 @@ import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoRequest
 import br.com.guilherme.governanca_cooperativa_api.web.dto.rest.voto.VotoResponse;
 import org.springframework.stereotype.Component;
 
-import static br.com.guilherme.governanca_cooperativa_api.utils.CpfUtils.mascararCpf;
-
 @Component
 public class VotoRestAssembler {
 
@@ -17,9 +15,8 @@ public class VotoRestAssembler {
 
     public VotoResponse toResponse(VotoOutput output) {
         return new VotoResponse(
-            output.id(),
+            output.protocolo(),
             output.pautaId(),
-            mascararCpf(output.associadoId()),
-            output.votoEscolha());
+            output.status());
     }
 }
