@@ -7,10 +7,11 @@
 # 4. Registrar votos
 # 5. Consultar resultado
 #
-# Contrato atual:
-# - POST /votos retorna apenas protocolo, pautaId e status=REGISTRADO
-# - GET /resultado durante a sessao retorna status=EM_ANDAMENTO sem totalSim/totalNao
-# - totais so devem ser divulgados apos o fechamento da sessao
+# Contrato e Segurança do Voto:
+# - POST /votos retorna apenas o `protocolo_publico` (UUID do RegistroParticipacao) e NÃO o ID da UrnaVoto.
+# - timestamps de consumo do token e de voto são truncados para minutos, quebrando correlações de timing attack.
+# - GET /resultado durante a sessao retorna status=EM_ANDAMENTO sem totalSim/totalNao para evitar inferência.
+# - Se ocorrer erro de checksum do Flyway localmente, execute: docker compose down -v; docker compose up -d.
 
 ###
 GET {{host}}/mobile/v1/pautas/nova
@@ -53,7 +54,7 @@ Content-Type: application/json
 ###
 # Retorno esperado:
 # {
-#   "protocolo": "<uuid>",
+#   "protocolo": "<uuid>", // Protocolo Público (registro_participacao.protocolo_publico) - NÃO é o ID da urna!
 #   "pautaId": "<uuid>",
 #   "status": "REGISTRADO"
 # }
