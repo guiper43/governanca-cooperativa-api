@@ -38,18 +38,39 @@ Se estiver no Windows e preferir sem wrapper:
 mvn clean spring-boot:run
 ```
 
-## Modelo de Votacao
+## Modelo de Votação & Anonimato
 
-O projeto foi ajustado para separar participacao do associado da cedula depositada.
+O projeto adota práticas de **Security by Design** para garantir a privacidade e o sigilo do voto, separando a verificação de elegibilidade do depósito físico da cédula no banco de dados.
 
-Estruturas principais:
-- `registro_participacao`: controla quem ja exerceu o direito de votar em uma pauta
-- `urna_voto`: guarda apenas a cedula anonima
+### Estruturas Principais de Persistência
+- **`registro_participacao`**: Registra que um associado exerceu o seu direito de votar em uma pauta específica. Contém o `associadoId` (CPF), a `pautaId`, um hash único do token de participação (`token_hash`) e um identificador público chamado **`protocolo_publico`** (UUID). Não há nenhuma ligação estrutural com a escolha do voto.
+- **`urna_voto`**: Contém apenas a pauta vinculada, a escolha registrada (`SIM` / `NAO`) e o timestamp. Não possui colunas como `associado_id`, `cpf` ou qualquer ponte com a identidade do eleitor.
 
-Objetivo:
-- impedir associacao direta entre eleitor e escolha dentro da urna
-- evitar exposicao de dados sensiveis no retorno do voto
-- impedir divulgacao de parciais durante a sessao
+---
+
+### Decisões de Arquitetura e Mitigação de Riscos
+
+#### 1. Prevenção de Correlação Temporal (Timing Attack)
+Em transações JDBC síncronas, se a gravação da participação e da urna ocorresse no mesmo instante em milissegundos, um atacante com acesso ao banco de dados (ou logs de transação/WAL) poderia inferir quem votou em quê por ordenação simples.
+- **Solução aplicada**: Os timestamps de consumo do token (`data_consumo` em `registro_participacao`) e de gravação do voto (`data_deposito` em `urna_voto`) são truncados para minutos (`.truncatedTo(ChronoUnit.MINUTES)`). Isso cria um agrupamento homogêneo de registros por janela de tempo, destruindo o alinhamento temporal 1:1 e mitigando correlações simples.
+
+#### 2. Protocolo Público vs. ID de Cédula
+Para fornecer um comprovante de recebimento ao eleitor sem vazar a chave do voto, a API retorna o campo `protocolo` na resposta de sucesso. Esse protocolo corresponde ao UUID aleatório público (`protocolo_publico`) gerado na tabela `registro_participacao`. A chave primária da tabela `urna_voto` nunca é exposta na resposta ou em logs da aplicação.
+
+#### 3. Limitações de Design e Escopo (Anonimato Persistido vs. Absoluto)
+*Esta é uma versão demonstrativa (portfólio) que prioriza a simplicidade de uso das APIs e telas móveis existentes, possuindo limitações conhecidas:*
+- **Acoplamento em Camada de Transporte (Payload HTTP)**: O endpoint POST `/v1/pautas/{id}/votos` recebe a identidade (CPF) e a escolha (`votoEscolha`) no mesmo payload HTTP. Embora os dados sejam desacoplados imediatamente no banco de dados, em nível de rede (proxies, logs de servidores HTTP/WAF) há uma junção temporária dessas informações. Em um cenário real altamente regulado, o fluxo seria dividido em dois endpoints separados (emissão de token de votação cega e posterior depósito na urna contendo apenas o token).
+- **Limitação de Baixo Volume**: O truncamento temporal para minutos é eficaz em cenários de tráfego simultâneo. Contudo, em sessões com baixíssimo volume (ex: um único voto em uma hora), o timestamp arredondado ainda pode permitir inferências indiretas se correlacionado com eventos externos (como o associado assinando fisicamente a ata de presença).
+
+---
+
+### Solução de Problemas Locais (Flyway Checksum Mismatch)
+> [!IMPORTANT]
+> Caso você já tenha executado uma versão anterior do projeto localmente e encontre erros de **checksum mismatch** no Flyway ao iniciar a aplicação (devido a alterações nos scripts de migração), execute o comando abaixo para remover os volumes locais do Docker e reinicie o ambiente:
+> ```bash
+> docker compose down -v
+> docker compose up -d
+> ```
 
 ## Contrato Atual da API
 
