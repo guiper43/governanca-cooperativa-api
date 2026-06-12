@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
@@ -36,6 +37,7 @@ public class VotoService {
     private final PautaService pautaService;
     private final CpfValidatorGateway cpfValidatorGateway;
 
+    @Transactional
     public VotoOutput votar(UUID pautaId, VotoInput request) {
         log.info("Iniciando voto. pautaId={}", pautaId);
 
@@ -44,11 +46,11 @@ public class VotoService {
         validarAssociado(request.associadoId(), pautaId, sessao.getId());
 
         Pauta pauta = pautaService.buscarEntidade(pautaId);
-        UUID votoId = registrarParticipacaoEDepositarCedula(pauta, sessao, request);
+        UUID participacaoId = registrarParticipacaoEDepositarCedula(pauta, sessao, request);
 
-        log.info("Voto registrado com sucesso. votoId={} pautaId={} sessaoId={}",
-                votoId, pautaId, sessao.getId());
-        return new VotoOutput(votoId, pauta.getId(), "REGISTRADO");
+        log.info("Voto registrado com sucesso. pautaId={} sessaoId={}",
+                pautaId, sessao.getId());
+        return new VotoOutput(participacaoId, pauta.getId(), "REGISTRADO");
     }
 
     private Sessao buscarSessaoAberta(UUID pautaId) {
@@ -84,14 +86,13 @@ public class VotoService {
         UUID votoId = UUID.randomUUID();
         RegistroParticipacao registroParticipacao = RegistroParticipacao.emitir(UUID.randomUUID(), pauta,
                 request.associadoId(), gerarTokenHash());
+        registroParticipacao.consumir();
         UrnaVoto urnaVoto = UrnaVoto.depositar(votoId, pauta, request.votoEscolha());
 
         try {
             registroParticipacaoRepository.save(registroParticipacao);
-            registroParticipacao.consumir();
-            registroParticipacaoRepository.save(registroParticipacao);
             urnaVotoRepository.save(urnaVoto);
-            return votoId;
+            return registroParticipacao.getProtocoloPublico();
         } catch (DataIntegrityViolationException e) {
             log.warn("Tentativa de voto duplicado. pautaId={} sessaoId={}", pauta.getId(), sessao.getId());
             throw new BusinessException("Associado ja votou nessa sessao");
