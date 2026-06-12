@@ -37,6 +37,6 @@ public class UrnaVoto {
     }
 
     public static UrnaVoto depositar(UUID id, Pauta pauta, VotoEscolha votoEscolha) {
-        return new UrnaVoto(id, pauta, votoEscolha, LocalDateTime.now());
+        return new UrnaVoto(id, pauta, votoEscolha, LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES));
     }
 }

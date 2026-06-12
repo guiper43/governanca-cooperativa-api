@@ -12,7 +12,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "registro_participacao", uniqueConstraints = {
         @UniqueConstraint(name = "uk_registro_participacao_pauta_associado", columnNames = { "pauta_id", "associado_id" }),
-        @UniqueConstraint(name = "uk_registro_participacao_token_hash", columnNames = "token_hash")
+        @UniqueConstraint(name = "uk_registro_participacao_token_hash", columnNames = "token_hash"),
+        @UniqueConstraint(name = "uk_registro_participacao_protocolo_publico", columnNames = "protocolo_publico")
 })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,6 +36,9 @@ public class RegistroParticipacao {
     @Column(name = "status", nullable = false, length = 20)
     private ParticipacaoStatus status;
 
+    @Column(name = "protocolo_publico", nullable = false)
+    private UUID protocoloPublico;
+
     @Column(name = "data_registro", nullable = false)
     private LocalDateTime dataRegistro;
 
@@ -42,23 +46,24 @@ public class RegistroParticipacao {
     private LocalDateTime dataConsumo;
 
     private RegistroParticipacao(UUID id, Pauta pauta, String associadoId, String tokenHash,
-                                 ParticipacaoStatus status, LocalDateTime dataRegistro, LocalDateTime dataConsumo) {
+                                  ParticipacaoStatus status, UUID protocoloPublico, LocalDateTime dataRegistro, LocalDateTime dataConsumo) {
         this.id = id;
         this.pauta = pauta;
         this.associadoId = associadoId;
         this.tokenHash = tokenHash;
         this.status = status;
+        this.protocoloPublico = protocoloPublico;
         this.dataRegistro = dataRegistro;
         this.dataConsumo = dataConsumo;
     }
 
     public static RegistroParticipacao emitir(UUID id, Pauta pauta, String associadoId, String tokenHash) {
         return new RegistroParticipacao(id, pauta, associadoId, tokenHash, ParticipacaoStatus.EMITIDO,
-                LocalDateTime.now(), null);
+                UUID.randomUUID(), LocalDateTime.now(), null);
     }
 
     public void consumir() {
         this.status = ParticipacaoStatus.CONSUMIDO;
-        this.dataConsumo = LocalDateTime.now();
+        this.dataConsumo = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES);
     }
 }
