@@ -60,6 +60,17 @@ Content-Type: application/json
 # }
 
 ###
+# Tentativa de voto duplicado (mesmo CPF 87868790067)
+# Retorno esperado: 422 Unprocessable Entity (REGRA_DE_NEGOCIO - Associado ja votou nessa sessao)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "87868790067",
+  "votoEscolha": "NAO"
+}
+
+###
 # Valido com CPF 98189135074
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
