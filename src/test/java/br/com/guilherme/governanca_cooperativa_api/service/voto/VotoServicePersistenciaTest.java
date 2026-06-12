@@ -83,14 +83,14 @@ class VotoServicePersistenciaTest {
         verify(cpfValidatorGateway).validar(request.associadoId());
         verify(pautaService).buscarEntidade(pautaId);
         verify(registroParticipacaoRepository).existsByPautaIdAndAssociadoId(pautaId, request.associadoId());
-        verify(registroParticipacaoRepository, org.mockito.Mockito.times(2)).save(registroCaptor.capture());
+        verify(registroParticipacaoRepository, org.mockito.Mockito.times(1)).save(registroCaptor.capture());
         verify(urnaVotoRepository).save(urnaCaptor.capture());
 
-        RegistroParticipacao ultimoRegistroSalvo = registroCaptor.getAllValues().get(1);
+        RegistroParticipacao ultimoRegistroSalvo = registroCaptor.getValue();
         UrnaVoto votoDepositado = urnaCaptor.getValue();
 
         assertAll(
-                () -> assertNotNull(response.protocolo()),
+                () -> assertEquals(ultimoRegistroSalvo.getProtocoloPublico(), response.protocolo()),
                 () -> assertEquals(pautaId, response.pautaId()),
                 () -> assertEquals("REGISTRADO", response.status()),
                 () -> assertEquals(ParticipacaoStatus.CONSUMIDO, ultimoRegistroSalvo.getStatus()),
