@@ -6,14 +6,14 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "voto", uniqueConstraints = @UniqueConstraint(name = "uk_voto_pauta_associado", columnNames = {
-        "pauta_id", "associado_id" }))
+@Table(name = "urna_voto")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Voto {
+public class UrnaVoto {
     @Id
     @Column(name = "id", nullable = false)
     private UUID id;
@@ -21,22 +21,22 @@ public class Voto {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "pauta_id", nullable = false)
     private Pauta pauta;
-    @Column(name = "associado_id", nullable = false, length = 100)
-    private String associadoId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "voto_escolha", nullable = false, length = 3)
     private VotoEscolha votoEscolha;
 
-    private Voto(UUID id, Pauta pauta, String associadoId, VotoEscolha votoEscolha) {
+    @Column(name = "data_deposito", nullable = false)
+    private LocalDateTime dataDeposito;
+
+    private UrnaVoto(UUID id, Pauta pauta, VotoEscolha votoEscolha, LocalDateTime dataDeposito) {
         this.id = id;
         this.pauta = pauta;
-        this.associadoId = associadoId;
         this.votoEscolha = votoEscolha;
+        this.dataDeposito = dataDeposito;
     }
 
-    public static Voto criar(UUID id, Pauta pauta, String associadoId, VotoEscolha votoEscolha) {
-        return new Voto(id, pauta, associadoId, votoEscolha);
-
+    public static UrnaVoto depositar(UUID id, Pauta pauta, VotoEscolha votoEscolha) {
+        return new UrnaVoto(id, pauta, votoEscolha, LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MINUTES));
     }
 }

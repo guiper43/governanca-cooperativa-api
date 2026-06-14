@@ -1,5 +1,18 @@
 @host = http://localhost:8080
 
+# Fluxo manual atualizado:
+# 1. Criar pauta
+# 2. Abrir sessao
+# 3. Consultar tela mobile de voto
+# 4. Registrar votos
+# 5. Consultar resultado
+#
+# Contrato e Segurança do Voto:
+# - POST /votos retorna apenas o `protocolo_publico` (UUID do RegistroParticipacao) e NÃO o ID da UrnaVoto.
+# - timestamps de consumo do token e de voto são truncados para minutos, quebrando correlações de timing attack.
+# - GET /resultado durante a sessao retorna status=EM_ANDAMENTO sem totalSim/totalNao para evitar inferência.
+# - Se ocorrer erro de checksum do Flyway localmente, execute: docker compose down -v; docker compose up -d.
+
 ###
 GET {{host}}/mobile/v1/pautas/nova
 
@@ -9,7 +22,7 @@ POST {{host}}/v1/pautas
 Content-Type: application/json
 
 {
-  "descricao": "Assembleia Geral Extraordinária - Dezembro/2026"
+  "descricao": "Assembleia Geral Extraordinaria - Dezembro/2026"
 }
 
 @pautaId = {{criarPauta.response.body.id}}
@@ -28,9 +41,8 @@ Content-Type: application/json
 ###
 GET {{host}}/mobile/v1/pautas/{{pautaId}}/votos/selecao
 
-
 ###
-# Válido com CPF 87868790067
+# Valido com CPF 87868790067
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
@@ -40,7 +52,26 @@ Content-Type: application/json
 }
 
 ###
-# Válido com CPF 98189135074
+# Retorno esperado:
+# {
+#   "protocolo": "<uuid>", // Protocolo Público (registro_participacao.protocolo_publico) - NÃO é o ID da urna!
+#   "pautaId": "<uuid>",
+#   "status": "REGISTRADO"
+# }
+
+###
+# Tentativa de voto duplicado (mesmo CPF 87868790067)
+# Retorno esperado: 422 Unprocessable Entity (REGRA_DE_NEGOCIO - Associado ja votou nessa sessao)
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
+
+{
+  "associadoId": "87868790067",
+  "votoEscolha": "NAO"
+}
+
+###
+# Valido com CPF 98189135074
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
@@ -50,7 +81,7 @@ Content-Type: application/json
 }
 
 ###
-# Válido com CPF 11933950030
+# Valido com CPF 11933950030
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
@@ -60,7 +91,7 @@ Content-Type: application/json
 }
 
 ###
-# Válido com CPF 57376476091
+# Valido com CPF 57376476091
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
@@ -70,7 +101,7 @@ Content-Type: application/json
 }
 
 ###
-# Inválido com CPF 00000000191
+# Valido com CPF 00000000191
 POST {{host}}/v1/pautas/{{pautaId}}/votos
 Content-Type: application/json
 
@@ -80,8 +111,24 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/v1/pautas/{{pautaId}}/resultado
+# Invalido com CPF 12345678912
+POST {{host}}/v1/pautas/{{pautaId}}/votos
+Content-Type: application/json
 
+{
+  "associadoId": "12345678912",
+  "votoEscolha": "SIM"
+}
+
+###
+# Enquanto a sessao estiver aberta, o retorno esperado e:
+# {
+#   "pautaId": "<uuid>",
+#   "totalSim": null,
+#   "totalNao": null,
+#   "status": "EM_ANDAMENTO"
+# }
+GET {{host}}/v1/pautas/{{pautaId}}/resultado
 
 ###
 # @name criarPautaExpirada
@@ -89,7 +136,7 @@ POST {{host}}/v1/pautas
 Content-Type: application/json
 
 {
-  "descricao": "Pauta Relâmpago para Teste de Timeout"
+  "descricao": "Pauta Relampago para Teste de Timeout"
 }
 
 @pautaExpiradaId = {{criarPautaExpirada.response.body.id}}
@@ -99,7 +146,7 @@ POST {{host}}/v1/pautas/{{pautaExpiradaId}}/sessoes
 Content-Type: application/json
 
 {
-    "duracaoMinutos": 1
+  "duracaoMinutos": 1
 }
 
 ###

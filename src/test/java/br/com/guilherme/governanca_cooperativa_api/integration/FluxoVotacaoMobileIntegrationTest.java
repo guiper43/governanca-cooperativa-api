@@ -76,12 +76,13 @@ class FluxoVotacaoMobileIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(votoReq)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.votoEscolha", is("SIM")));
+                .andExpect(jsonPath("$.protocolo").exists())
+                .andExpect(jsonPath("$.status", is("REGISTRADO")));
 
         mockMvc.perform(get("/v1/pautas/{id}/resultado", pautaId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalSim", is(1)))
-                .andExpect(jsonPath("$.totalNao", is(0)));
+                .andExpect(jsonPath("$.status", is("EM_ANDAMENTO")))
+                .andExpect(jsonPath("$.totalSim").doesNotExist())
+                .andExpect(jsonPath("$.totalNao").doesNotExist());
     }
 }

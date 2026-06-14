@@ -5,7 +5,7 @@ import br.com.guilherme.governanca_cooperativa_api.domain.entity.Sessao;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.ResultadoStatus;
 import br.com.guilherme.governanca_cooperativa_api.domain.enums.VotoEscolha;
 import br.com.guilherme.governanca_cooperativa_api.domain.repository.SessaoRepository;
-import br.com.guilherme.governanca_cooperativa_api.domain.repository.VotoRepository;
+import br.com.guilherme.governanca_cooperativa_api.domain.repository.UrnaVotoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class ResultadoService {
-    private final VotoRepository votoRepository;
+    private final UrnaVotoRepository urnaVotoRepository;
     private final SessaoRepository sessaoRepository;
     private final PautaService pautaService;
 
@@ -28,6 +28,11 @@ public class ResultadoService {
         pautaService.buscarEntidade(pautaId);
 
         Sessao sessao = buscarSessao(pautaId);
+        if (sessaoEmAndamento(sessao)) {
+            log.info("Resultado indisponivel para parcial. pautaId={} status={}", pautaId, ResultadoStatus.EM_ANDAMENTO);
+            return new ResultadoOutput(pautaId, null, null, ResultadoStatus.EM_ANDAMENTO);
+        }
+
         long totalSim = contarVotos(pautaId, VotoEscolha.SIM);
         long totalNao = contarVotos(pautaId, VotoEscolha.NAO);
         ResultadoStatus status = calcularStatus(sessao, totalSim, totalNao);
@@ -39,17 +44,21 @@ public class ResultadoService {
     private Sessao buscarSessao(UUID pautaId) {
         return sessaoRepository.findByPautaId(pautaId)
                 .orElseThrow(() -> {
-                    log.warn("Sessão não encontrada para pauta. pautaId={}", pautaId);
-                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessão não encontrada para a pauta");
+                    log.warn("Sessao nao encontrada para pauta. pautaId={}", pautaId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Sessao nao encontrada para a pauta");
                 });
     }
 
     private long contarVotos(UUID pautaId, VotoEscolha escolha) {
-        return votoRepository.countByPautaIdAndVotoEscolha(pautaId, escolha);
+        return urnaVotoRepository.countByPautaIdAndVotoEscolha(pautaId, escolha);
+    }
+
+    private boolean sessaoEmAndamento(Sessao sessao) {
+        return LocalDateTime.now().isBefore(sessao.getDataFechamento());
     }
 
     private ResultadoStatus calcularStatus(Sessao sessao, long totalSim, long totalNao) {
-        if (LocalDateTime.now().isBefore(sessao.getDataFechamento())) {
+        if (sessaoEmAndamento(sessao)) {
             return ResultadoStatus.EM_ANDAMENTO;
         }
         if (totalSim > totalNao) {
